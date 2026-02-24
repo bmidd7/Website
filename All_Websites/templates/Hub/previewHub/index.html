@@ -11,3 +11,10 @@
         <script src="'{% static }"></script>
     </body>
 </html>
+
+
+from django.contrib.auth import get_user_model
+me = get_user_model().objects.get(username='bradm').pk = 1
+me.pk = 1
+me.save()
+User.objects.filter(username='your_username').exclude(pk=100).delete()

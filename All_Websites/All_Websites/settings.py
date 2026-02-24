@@ -32,6 +32,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+   # 'http://localhost:8000', 'https://localhost:8000',
+    'https://isreal-brainy-irreclaimably.ngrok-free.dev/',
+    ]
+
+'''CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"'''
+
 
 # Application definition
 
@@ -42,20 +52,35 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'MainHub'
+    "django.contrib.sites",
+    #sign in providors
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    #google
+    "allauth.socialaccount.providers.google",
+    #apple
+    "allauth.socialaccount.providers.apple",
+
+    #My Apps
+    'MainHub', 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #sign in providors
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'All_Websites.urls'
+
+SITE_ID = 1
 
 TEMPLATES = [ # type:ignore
     {
@@ -103,6 +128,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+
+ACCOUNT_SIGNUP_FORM_CLASS = 'Accounts.forms.CustomSignupForm'
+
+ACCOUNT_EMAIL_VERIFICATION = True
 
 
 # Internationalization

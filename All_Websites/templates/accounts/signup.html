@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            Signup
+        </title>
+    </head>
+<body>
+    <div>
+        <strong>Menu:</strong>
+        <ul>
+            <li>
+                <a href="/accounts/login/">Sign In</a>
+             </li>
+            <li>
+                <a href="/accounts/signup/">Sign Up</a>
+            </li>
+        </ul>
+    </div>
+    <h1>
+        Sign Up
+    </h1>
+    <p>
+        Already have an account? Then please <a href="/accounts/login/">sign in</a>.
+    </p>
+    <form method="post" action="/accounts/signup/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="mt6MtvcG8nJ2blFhhSdLaUco6cTFLhTz85mem9Wv60gVIZQLCFW9YbgGSX1Ma2uc">
+        <p>
+            <label for="id_email">
+                Email:
+            </label>
+            <input type="email" name="email" autocomplete="email" placeholder="Email address" maxlength="320" required="" id="id_email">
+        </p>
+        <p>
+            <label for="id_username">
+                Username:
+            </label>
+            <input type="text" name="username" placeholder="Username" autocomplete="username" minlength="1" maxlength="150" required="" id="id_username">
+        </p>
+        <p>
+            <label for="id_first_name">
+                First name (optional):
+            </label>
+            <input type="text" name="first_name" placeholder="First Name" maxlength="20" id="id_first_name">
+        </p>
+        <p>
+            <label for="id_last_name">
+                Last name (optional):
+            </label>
+            <input type="text" name="last_name" placeholder="Last Name" maxlength="50" id="id_last_name">
+        </p>
+        <p>
+            <label for="id_password1">
+                Password:
+            </label>
+            <input type="password" name="password1" placeholder="Password" autocomplete="new-password" required="" aria-describedby="id_password1_helptext" id="id_password1">
+
+            <span class="helptext" id="id_password1_helptext"></span>
+        </p>
+        <ul>
+            <li>
+                Your password can’t be too similar to your other personal information.
+            </li>
+            <li>
+                Your password must contain at least 8 characters.
+            </li>
+            <li>
+                Your password can’t be a commonly used password.
+            </li>
+            <li>
+                Your password can’t be entirely numeric.
+            </li>
+        </ul>
+        <p></p>
+        <p>
+            <label for="id_password2">Password (again):</label>
+            <input type="password" name="password2" placeholder="Password (again)" autocomplete="new-password" required="" id="id_password2">
+        </p>
+            <button type="submit">
+                Sign Up
+            </button>        
+    </form>
+    <audio class="audio-output" style="display: none;"></audio>
+        <div id="volume-booster-visusalizer">
+            <div class="sound">
+                <div class="sound-icon"></div>
+                <div class="sound-wave sound-wave_one"></div>
+                <div class="sound-wave sound-wave_two"></div>
+                <div class="sound-wave sound-wave_three"></div>
+            </div>
+            <div class="segments-box">
+                <div data-range="1-20" class="segment">
+                    <span></span>
+                </div>
+                <div data-range="21-40" class="segment">
+                    <span></span>
+                </div>
+                <div data-range="41-60" class="segment">
+                    <span></span>
+                </div>
+                <div data-range="61-80" class="segment">
+                    <span></span>
+                </div>
+                <div data-range="81-100" class="segment">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
