@@ -1,0 +1,58 @@
+$sidebar-width: 15%; //of body
+
+
+.TEST {
+    background-color: pink;
+}
+
+
+
+.hidden {
+    display: none;
+}
+
+#wrapper-div {
+    display: flex;
+    flex-direction: row;
+}
+
+
+
+#main {
+    flex-grow: 1;
+}
+
+
+.sidebar {
+    width: 0;
+    overflow: hidden;
+    transition: width .5s ease;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.open {
+    width: $sidebar-width;
+}
+
+
+
+
+#top-sidebar-buttons{
+    display: flex;
+    flex-direction: row;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*# sourceMappingURL=basehtml.scss.map */

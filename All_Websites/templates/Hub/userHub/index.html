@@ -1,13 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title>
-            Hub
-        </title>
-        <meta charset="utf-8">
-    </head>
-    <body>
-        <h1>Welcome to Brad's User Hub</h1>
-        <script src="'{% static }"></script>
-    </body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+    Hub
+{% endblock %}
+
+{% block app-specific-logo-in-sidebar %}
+<a>
+    
+</a>
+{% endblock %}
+
+
+{% block main %}
+    <div id="open-sidebar-div">
+        <button id="open-sidebar">
+            ☰
+        </button>
+    </div>
+    <h5>Welcome to Brad's User Hub</h5>
+    <!--  <script src="'{% static }"></script>  -->
+{% endblock %}
+

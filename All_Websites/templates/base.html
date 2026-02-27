@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>
+            {% block title %}
+            {% endblock %}
+        </title>
+    </head>
+
+
+    <body>
+        <div id="wrapper-div"><!-- Used to allow main content and sidepanel to be art of a flex box, so content can move over when sidebar is opened -->
+            <nav id="sidebar" class="sidebar">
+                <div id="top-sidebar-buttons">
+                    <div id="close-sidebar-div">
+                        <button id="close-sidebar"  class="sidebar-buttons">
+                            ☰
+                        </button>
+                    </div>
+                    <div id="sidebar-logo-div" class="sidebar-buttons">
+                        <a href="/" name="sidebar-logo-link">
+                            <img src="{% static 'img/logo.svg' %}" id="sidebar-logo" alt="Website Logo | Return to Home Page">
+                        </a>
+                    </div>
+                    <div id="app-specific-logo" class="sidebar-buttons">
+                        {% block app-specific-logo-in-sidebar %}
+                        {% endblock %}
+                    </div>
+                    <div id="settings-button-div">
+                        <a id="settings-button-link" class="sidebar-buttons">
+                            <button id="settings-button" class="sidebar-buttons">
+                                ⚙
+                            </button>
+                        </a>          
+                    </div>
+                </div>
+                <div id="feedback">
+                    <form id="feedback-box">
+                        <label for="feedback-textarea">Feedback:</label><br>
+                        <textarea id="feedback-textarea" name="feedback" rows="4" cols="20" placeholder="Enter your feedback here..."></textarea>
+                        <br>
+                        <button type="submit" id="submit-feedback-button">Submit</button>
+                    </form>
+                    <div id="feedback-type-selection">
+                    </div>
+                </div>
+            </nav>
+
+
+
+            <main name="main" id="main">
+                {% block main %}
+                {% endblock %}
+            </main>
+        </div>
+
+        <script src="{% static 'js/basehtml.sidebar.js' %}"></script>
+
+        <link rel="stylesheet" href="{% static 'css/basehtml/basehtml.css' %}">
+    </body>
+</html>
