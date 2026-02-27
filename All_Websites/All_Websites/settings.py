@@ -173,5 +173,5 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'b.rad.m.website@gmail.com'
-EMAIL_HOST_PASSWORD = 'bhznyibohcdizfao'
+EMAIL_HOST_PASSWORD = 'lrjxislyrmnsjpky' # A -> K, to get real undo
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
