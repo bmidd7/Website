@@ -13,6 +13,8 @@
 
 #main {
   flex-grow: 1;
+  padding: 2px;
+  padding-left: 5px;
 }
 
 .sidebar {
@@ -21,15 +23,37 @@
   transition: width 0.5s ease;
   display: flex;
   flex-direction: column;
+  background-color: transparent;
 }
 
 .sidebar.open {
-  width: 15%;
+  width: 10%;
+  border-right: 2px solid darkslategray;
+  padding: 2px;
 }
 
 #top-sidebar-buttons {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 2.5px;
+}
+
+.sidebar-buttons {
+  display: flex;
+  height: 25px;
+  width: 25px;
+  background-color: transparent;
+  border-color: transparent;
+  justify-content: center;
+  align-content: center;
+}
+
+.hover-over-buttons.moused-over {
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
 }
 
 /*# sourceMappingURL=basehtml.css.map */

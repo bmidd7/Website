@@ -1,7 +1,7 @@
-const sidebar = document.getElementById('sidebar')
-const sidebarCloseButton = document.getElementById('close-sidebar')
-const sidebarOpenButton = document.getElementById('open-sidebar')
 const page = document.getElementById('main')
+const sidebar = document.getElementById('sidebar')
+const sidebarOpenButton = document.getElementById('open-sidebar')
+const sidebarCloseButton = document.getElementById('close-sidebar')
 
 //Close Sidebar when button clicked
 sidebarCloseButton.addEventListener('click', () => { // If you click on the close sidebar button
@@ -35,5 +35,23 @@ sidebarOpenButton.addEventListener('click', () => {
     sidebar.classList.add('open'); // Opens sidepanel
     sidebarOpenButton.classList.add('hidden'); // makes button to open sidebar disappear
     console.log('Sidebar opened by clicking open button'); // Logs the action
-    page.classList.toggle('TEST')
+    //page.classList.toggle('TEST')
+});
+
+//Checks if button is hovered over and adds outline
+document.addEventListener('mouseover', (event) => {
+    const button = event.target.closest('.hover-over-buttons');
+    if (button) {  // If the button supports an outline,
+        button.classList.add('moused-over'); // Add outline class
+        console.log(`${event.target} has been hovered over!`) // Log it!
+    }
+});
+
+//Checks if button is hovered over and removes outline
+document.addEventListener('mouseout', (event) => {
+    const button = event.target.closest('.hover-over-buttons');
+    if (button) {  // If the button supports an outline,
+        button.classList.remove('moused-over'); // Remove outline class
+        console.log(`${event.target} has been un-hovered over!`) // Log it!
+    }
 });

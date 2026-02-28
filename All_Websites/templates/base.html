@@ -17,22 +17,22 @@
             <nav id="sidebar" class="sidebar">
                 <div id="top-sidebar-buttons">
                     <div id="close-sidebar-div">
-                        <button id="close-sidebar"  class="sidebar-buttons">
+                        <button id="close-sidebar"  class="sidebar-buttons hover-over-buttons">
                             ☰
                         </button>
                     </div>
-                    <div id="sidebar-logo-div" class="sidebar-buttons">
+                    <div id="sidebar-logo-div" class="sidebar-buttons hover-over-buttons">
                         <a href="/" name="sidebar-logo-link">
                             <img src="{% static 'img/logo.svg' %}" id="sidebar-logo" alt="Website Logo | Return to Home Page">
                         </a>
                     </div>
-                    <div id="app-specific-logo" class="sidebar-buttons">
+                    <div id="app-specific-logo" class="sidebar-buttons hover-over-buttons">
                         {% block app-specific-logo-in-sidebar %}
                         {% endblock %}
                     </div>
                     <div id="settings-button-div">
-                        <a id="settings-button-link" class="sidebar-buttons">
-                            <button id="settings-button" class="sidebar-buttons">
+                        <a id="settings-button-link" class="sidebar-buttons hover-over-buttons">
+                            <button id="settings-button" class="sidebar-buttons hover-over-buttons">
                                 ⚙
                             </button>
                         </a>          
@@ -41,7 +41,7 @@
                 <div id="feedback">
                     <form id="feedback-box">
                         <label for="feedback-textarea">Feedback:</label><br>
-                        <textarea id="feedback-textarea" name="feedback" rows="4" cols="20" placeholder="Enter your feedback here..."></textarea>
+                        <textarea id="feedback-textarea" name="feedback" rows="4" cols="15" placeholder="Enter your feedback here..."></textarea>
                         <br>
                         <button type="submit" id="submit-feedback-button">Submit</button>
                     </form>

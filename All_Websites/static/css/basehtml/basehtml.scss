@@ -1,4 +1,7 @@
-$sidebar-width: 15%; //of body
+$sidebar-width: 10%; //of body
+$sidebar-background-color: transparent;
+$button-height-width: 25px;
+$hover-over-color: rgba(0,0,0,.5);
 
 
 .TEST {
@@ -20,6 +23,8 @@ $sidebar-width: 15%; //of body
 
 #main {
     flex-grow: 1;
+    padding: 2px;
+    padding-left: 5px;
 }
 
 
@@ -30,10 +35,15 @@ $sidebar-width: 15%; //of body
 
     display: flex;
     flex-direction: column;
+
+    background-color: $sidebar-background-color;
 }
 
 .sidebar.open {
     width: $sidebar-width;
+
+    border-right: 2px solid darkslategray;
+    padding: 2px;
 }
 
 
@@ -42,8 +52,32 @@ $sidebar-width: 15%; //of body
 #top-sidebar-buttons{
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+
+    //justify-content: space-between;
+    align-content: center;
+    gap: 2.5px;
 }
 
+
+.sidebar-buttons{
+    display: flex;
+
+    height: $button-height-width;
+    width: $button-height-width;
+
+    background-color: transparent;
+    border-color: transparent;
+    
+    justify-content: center;
+    align-content: center;
+}
+
+.hover-over-buttons.moused-over{
+    background-color: $hover-over-color;
+    box-shadow: 0 0 0 2px $hover-over-color;
+    border-radius: 50%;
+}
 
 
 

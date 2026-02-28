@@ -1,0 +1,22 @@
+$button-height-width: 25px;
+$hover-over-color: rgba(0,0,0,.5);
+
+
+.open-sidebar{
+    display: flex;
+
+    height: $button-height-width;
+    width: $button-height-width;
+
+    background-color: transparent;
+    border-color: transparent;
+    
+    justify-content: center;
+    align-content: center;
+}
+
+.open-sidebar.moused-over{
+    background-color: $hover-over-color;
+    box-shadow: 0 0 0 2px $hover-over-color;
+    border-radius: 50%;
+}
