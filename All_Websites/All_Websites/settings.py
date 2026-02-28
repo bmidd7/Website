@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -78,9 +82,20 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware'
 ]
 
+SOCIALACCOUNT_ADAPTER = "Accounts.adapter.MySocialAccountAdapter"
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+
+
 ROOT_URLCONF = 'All_Websites.urls'
 
-SITE_ID = 1
+SITE_ID = 2
+
+
 
 TEMPLATES = [ # type:ignore
     {
@@ -139,6 +154,12 @@ ACCOUNT_SIGNUP_FORM_CLASS = 'Accounts.forms.CustomSignupForm'
 
 ACCOUNT_EMAIL_VERIFICATION = True
 
+ACCOUNT_UNIQUE_EMAIL = False
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_UNIQUE_EMAIL = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -172,6 +193,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'b.rad.m.website@gmail.com'
-EMAIL_HOST_PASSWORD = 'lrjxislyrmnsjpky' # A -> K, to get real undo
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

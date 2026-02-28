@@ -1,0 +1,8 @@
+All_Websites/.env
+.env
+__pycache__/
+*.pyc
+*.DS_Store
+All_Websites/static/img/Google Logos/Android/png@1x/.DS_Store
+All_Websites/All_Websites/__pycache__/settings.cpython-314.pyc
+All_Websites/db.sqlite3
