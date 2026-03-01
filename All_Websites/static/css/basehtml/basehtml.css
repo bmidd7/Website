@@ -9,6 +9,7 @@
 #wrapper-div {
   display: flex;
   flex-direction: row;
+  font: YuGothicUI-Bold;
 }
 
 #main {
@@ -56,4 +57,15 @@
   border-radius: 50%;
 }
 
+#feedback-type-fieldset {
+  display: flex;
+  flex-direction: row;
+  border: none;
+  padding: 0;
+  padding-left: 2;
+}
+
+/*#feedback-legend{
+    font-size: 14px;
+}*/
 /*# sourceMappingURL=basehtml.css.map */

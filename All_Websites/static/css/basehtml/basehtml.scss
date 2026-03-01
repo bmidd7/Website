@@ -2,6 +2,7 @@ $sidebar-width: 10%; //of body
 $sidebar-background-color: transparent;
 $button-height-width: 25px;
 $hover-over-color: rgba(0,0,0,.5);
+$default-font: YuGothicUI-Bold;
 
 
 .TEST {
@@ -17,6 +18,8 @@ $hover-over-color: rgba(0,0,0,.5);
 #wrapper-div {
     display: flex;
     flex-direction: row;
+
+    font: $default-font;
 }
 
 
@@ -81,8 +84,19 @@ $hover-over-color: rgba(0,0,0,.5);
 
 
 
+#feedback-type-fieldset{
+    display: flex;
+    flex-direction: row;
+    
+    border: none;
 
+    padding: 0;
+    padding-left: 2;
+}
 
+/*#feedback-legend{
+    font-size: 14px;
+}*/
 
 
 

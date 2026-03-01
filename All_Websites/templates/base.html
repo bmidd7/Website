@@ -13,7 +13,7 @@
 
 
     <body>
-        <div id="wrapper-div"><!-- Used to allow main content and sidepanel to be art of a flex box, so content can move over when sidebar is opened -->
+        <div id="wrapper-div"><!-- Used to allow main content and sidepanel to be part of a flex box, so content can move over when sidebar is opened -->
             <nav id="sidebar" class="sidebar">
                 <div id="top-sidebar-buttons">
                     <div id="close-sidebar-div">
@@ -38,16 +38,32 @@
                         </a>          
                     </div>
                 </div>
-                <div id="feedback">
-                    <form id="feedback-box">
-                        <label for="feedback-textarea">Feedback:</label><br>
-                        <textarea id="feedback-textarea" name="feedback" rows="4" cols="15" placeholder="Enter your feedback here..."></textarea>
-                        <br>
-                        <button type="submit" id="submit-feedback-button">Submit</button>
-                    </form>
-                    <div id="feedback-type-selection">
-                    </div>
-                </div>
+                <details>
+                    <summary id="feedback-summary">
+                        Feedback
+                    </summary>
+                    <div id="feedback-div">
+                        <form id="feedback-box">
+                            <textarea id="feedback-textarea" name="feedback" rows="4" cols="15" placeholder="Enter your feedback here..."></textarea>
+
+                            <br>
+
+                            <div id="feedback-type-selection">
+                                <fieldset id="feedback-type-fieldset">
+                                    <legend id="feedback-legend">
+                                        What type of feedback are you providing?
+                                    </legend>
+                                    <label>
+
+                                    </label>
+                                </fieldset>
+                            </div>
+
+                            <button type="submit" id="submit-feedback-button">Submit</button>
+                        </form>
+          
+                    </div>  
+                </details>
             </nav>
 
 
