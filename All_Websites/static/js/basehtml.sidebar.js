@@ -1,5 +1,6 @@
 const page = document.getElementById('main')
-const sidebar = document.getElementById('sidebar')
+const sidebar  = document.getElementById('sidebar')
+const sidebarHandle = document.getElementById('sidebar-handle')
 const sidebarOpenButton = document.getElementById('open-sidebar')
 const sidebarCloseButton = document.getElementById('close-sidebar')
 

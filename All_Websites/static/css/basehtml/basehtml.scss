@@ -30,11 +30,45 @@ $default-font: YuGothicUI-Bold;
     padding-left: 5px;
 }
 
+.sidebar-wrapper.open {
+    width: $sidebar-width;
+
+    //border-right: 2px solid darkslategray;
+    padding: 2px;
+}
+
+
+#sidebar-handle{
+    position: absolute;
+    right: 0;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    width: 5%;
+    height: 100%;
+
+    cursor: ew-resize;
+}
+
+
+#sidebar-handle-color{
+    width: 25%;
+
+    background-color: darkslategray;
+}
+
+
+
+
 
 .sidebar {
     width: 0;
     overflow: hidden;
     transition: width .5s ease;
+
+    position: relative;
 
     display: flex;
     flex-direction: column;
@@ -42,10 +76,9 @@ $default-font: YuGothicUI-Bold;
     background-color: $sidebar-background-color;
 }
 
-.sidebar.open {
+.sidebar.open{    
     width: $sidebar-width;
 
-    border-right: 2px solid darkslategray;
     padding: 2px;
 }
 
@@ -94,9 +127,9 @@ $default-font: YuGothicUI-Bold;
     padding-left: 2;
 }
 
-/*#feedback-legend{
+#feedback-legend{
     font-size: 14px;
-}*/
+}
 
 
 
