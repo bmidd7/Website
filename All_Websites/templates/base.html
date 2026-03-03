@@ -31,7 +31,7 @@
                         {% endblock %}
                     </div>
                     <div id="settings-button-div">
-                        <a id="settings-button-link" class="sidebar-buttons hover-over-buttons">
+                        <a href="settings/" id="settings-button-link" class="sidebar-buttons hover-over-buttons no-underline">
                             <button id="settings-button" class="sidebar-buttons hover-over-buttons">
                                 ⚙
                             </button>
@@ -53,9 +53,12 @@
                                     <legend id="feedback-legend">
                                         What type of feedback are you providing?
                                     </legend>
-                                    <label>
-
-                                    </label>
+                                    <div id="feedback-type-checkbox-div">
+                                        <label>
+                                            <input type="checkbox" class="squircle">
+                                            TEST
+                                        </label>
+                                    </div>
                                 </fieldset>
                             </div>
 
@@ -79,7 +82,8 @@
             </main>
         </div>
 
-        <script src="{% static 'js/basehtml.sidebar.js' %}"></script>
+        <script type="module" src="{% static 'js/basehtml/sidebar/open.js' %}"></script>
+        <script type="module" src="{% static 'js/basehtml/sidebar/resize.js' %}"></script>
 
         <link rel="stylesheet" href="{% static 'css/basehtml/basehtml.css' %}">
     </body>
