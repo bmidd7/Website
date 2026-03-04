@@ -1,5 +1,6 @@
-$sidebar-width: 10%; //of body
-$sidebar-background-color: transparent;
+$sidebar-default-width: clamp(5vw, 10vw, 60vw);
+$sidebar-background-color: rgba(255,255,255,1);
+$sidebar-handle-width: 10px;
 $button-height-width: 25px;
 $hover-over-color: rgba(0,0,0,.5);
 $default-font: YuGothicUI-Bold;
@@ -19,36 +20,33 @@ $text-color: black;
 #wrapper-div {
     display: flex;
     flex-direction: row;
+    min-height: 100vh;
 
-    font: $default-font;
+    font-family: $default-font;
 }
 
 
 
 #main {
     flex-grow: 1;
+    min-width: 0;
     padding: 2px;
     padding-left: 5px;
 }
 
-.sidebar-wrapper.open {
-    width: $sidebar-width;
-
-    //border-right: 2px solid darkslategray;
-    padding: 2px;
-}
-
-
 #sidebar-handle{
     position: absolute;
+    top: 0;
+    bottom: 0;
     right: 0;
 
     display: flex;
     flex-direction: row;
-    justify-content: left;
+    justify-content: center;
 
-    width: 4%;
-    height: 100%;
+    width: $sidebar-handle-width;
+
+    background-color: $sidebar-background-color;
 
     cursor: ew-resize;
     touch-action: none;
@@ -67,8 +65,11 @@ $text-color: black;
 
 .sidebar {
     width: 0;
+    min-width: 0;
+    max-width: 80vw;
     overflow: hidden;
     transition: width .5s ease;
+    box-sizing: border-box;
 
     position: relative;
 
@@ -79,9 +80,10 @@ $text-color: black;
 }
 
 .sidebar.open{    
-    width: $sidebar-width;
+    width: $sidebar-default-width;
 
     padding: 2px;
+    padding-right: calc(2px + #{$sidebar-handle-width});
 }
 
 
@@ -128,7 +130,7 @@ $text-color: black;
     border: none;
 
     padding: 0;
-    padding-left: 2;
+    padding-left: 2px;
 }
 
 #feedback-legend{

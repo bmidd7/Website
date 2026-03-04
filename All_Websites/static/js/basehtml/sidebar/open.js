@@ -1,27 +1,64 @@
 import { mainPage, sidebar, sidebarOpenButton, sidebarCloseButton } from './globalVars.js'
 
+const defaultSidebarWidth = "clamp(5vw, 10vw, 60vw)"; // Default open width still lets resize
+
+// Open sidebar
+function openSidebar() {
+  // If sidebar is missing for some reason ...
+  if (!sidebar) {
+    return; // Don't do anything
+  }
+
+  sidebar.classList.add("open"); // Opens sidepanel
+  sidebar.style.width = defaultSidebarWidth; // Always force opens sidebar to default width
+
+  // If open button exists on this page ...
+  if (sidebarOpenButton) {
+    sidebarOpenButton.classList.add("hidden"); // makes button to open sidebar disappear
+  }
+}
+
+// Close sidebar helper so all close actions do the same thing
+function closeSidebar() {
+  // If sidebar is missing for some reason ...
+  if (!sidebar) {
+    return; // Don't do anything
+  }
+
+  sidebar.classList.remove("open"); // Remove open class, meaning the sidebar goes away
+  sidebar.style.width = "0px"; // Always force closes sidebar, no matter current pos
+
+  // If open button exists on this page ...
+  if (sidebarOpenButton) {
+    sidebarOpenButton.classList.remove("hidden"); // makes button to open sidebar appear
+  }
+}
 
 //Close Sidebar when button clicked
-sidebarCloseButton.addEventListener("click", () => {
-  // If you click on the close sidebar button
-  sidebar.classList.remove("open"); // Remove open class, meaning the sidebar goes away
-  sidebar.style.width = "0"; // Always force closes sidebar, no matter current pos
-  sidebarOpenButton.classList.remove("hidden"); // makes button to open sidebar appear
-  console.log("Sidebar closed by clicking close button"); // Logs the action
-  //mainPage.classList.toggle('TEST')
-});
+if (sidebarCloseButton) {
+  sidebarCloseButton.addEventListener("click", () => {
+    // If you click on the close sidebar button ...
+    closeSidebar();
+    console.log("Sidebar closed by clicking close button"); // Logs the action
+    //mainPage.classList.toggle('TEST')
+  });
+}
 
 //Close sidebar on click-out on mobile only
 function mobileClickOutside(clickLocation) {
-  if (window.innerWidth <= 550) {  // Checks if screen is roughly phone sized (iPhone 17 Pro Max ~ 450, Samsung Galaxy S25 Ultra ~ 412) in px, extra for bigger phone screens
+  // If sidebar is missing for some reason ...
+  if (!sidebar) {
+    return; // Don't do anything
+  }
+
+  if (window.innerWidth <= 550) {  // Checks if screen is roughly phone sized in px
     if (
       sidebar.classList.contains("open") &&
       !clickLocation.target.closest("#sidebar")
     ) {
       // If sidebar is open AND click location is outside of the sidebar
-      if (clickLocation.target !== sidebarOpenButton) {  // In case you hold click or other potentional errors
-        sidebar.classList.remove("open"); // Remove open class, meaning the sidebar goes away
-        sidebarOpenButton.classList.remove("hidden"); // makes button to open sidebar appear
+      if (clickLocation.target !== sidebarOpenButton) {  // In case you hold click or other potential errors
+        closeSidebar();
         console.log("Sidebar closed by clicking outside"); // Logs the action
       }
     }
@@ -32,13 +69,14 @@ document.addEventListener("click", mobileClickOutside);
 document.addEventListener("touchstart", mobileClickOutside);
 
 //Open sidebar when button clicked
-sidebarOpenButton.addEventListener("click", () => {
-  sidebar.classList.add("open"); // Opens sidepanel
-  sidebar.style.width = "10%"; // Always force opens sidebar, no matter last pos
-  sidebarOpenButton.classList.add("hidden"); // makes button to open sidebar disappear
-  console.log("Sidebar opened by clicking open button"); // Logs the action
-  //mainPage.classList.toggle('TEST')
-});
+if (sidebarOpenButton) {
+  sidebarOpenButton.addEventListener("click", () => {
+    // If you click on the open sidebar button ...
+    openSidebar();
+    console.log("Sidebar opened by clicking open button"); // Logs it
+    //mainPage.classList.toggle('TEST')
+  });
+}
 
 //Checks if button is hovered over and adds outline
 document.addEventListener("mouseover", (event) => {
