@@ -57,6 +57,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "django.contrib.sites",
+    #API Stuff
+    'rest_framework',
+    'corsheaders',
     #sign in providors
     "allauth",
     "allauth.account",
@@ -67,10 +70,13 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.apple",
 
     #My Apps
-    'MainHub', 
+    'MainHub',
+    'Accounts',
+    'APIs'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -96,8 +102,10 @@ ROOT_URLCONF = 'All_Websites.urls'
 SITE_ID = 2
 
 
+CORS_ALLOW_ALL_ORIGINS = True
 
-TEMPLATES = [ # type:ignore
+
+TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR/'templates'],

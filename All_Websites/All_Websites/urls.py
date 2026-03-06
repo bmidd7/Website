@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include('MainHub.urls')),
     path('accounts/', include('Accounts.urls')),
     path('accounts/', include('allauth.urls')),
+    path('API/', include('APIs.urls'))
 ]

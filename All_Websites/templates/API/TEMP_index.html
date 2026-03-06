@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 MQTT Trigger</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body>
+  <h1>ESP32 Trigger</h1>
+  <button onclick="triggerON()">Turn LEDs ON</button>
+  <button onclick="triggerOFF()">Turn LEDs OFF</button>
+
+  <script>
+    // Connect to broker via WebSockets
+    const client = mqtt.connect('ws://192.168.4.28:9001');
+
+    client.on('connect', function () {
+      console.log('Connected to MQTT broker!');
+    });
+
+    function triggerON() {
+      client.publish('esp/all', 'ON');
+    }
+
+    function triggerOFF() {
+      client.publish('esp/all', 'OFF');
+    }
+  </script>
+</body>
+</html>
