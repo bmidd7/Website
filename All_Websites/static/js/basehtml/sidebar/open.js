@@ -1,4 +1,4 @@
-import { mainPage, sidebar, sidebarOpenButton, sidebarCloseButton } from './globalVars.js'
+import { mainPage, sidebar, sidebarOpenButton, sidebarCloseButton } from '../../globalVars.js' //from grandparent folder
 
 const defaultSidebarWidth = "clamp(5vw, 10vw, 60vw)"; // Default open width still lets resize
 

@@ -4,3 +4,5 @@ export const sidebarOpenButton = document.getElementById("open-sidebar");
 export const sidebarCloseButton = document.getElementById("close-sidebar");
 
 export const sidebarHandle = document.getElementById("sidebar-handle");
+
+export const webAddressWithEndSlash = 'https://isreal-brainy-irreclaimably.ngrok-free.dev/'

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+    Camera TM TF JS
+{% endblock %}
+
+{% block app-specific-logo-in-sidebar %}
+<a href="/API/Camera/" id="this-app-button-link" class="sidebar-buttons hover-over-buttons no-underline">
+    <button id="this-app-button" class="sidebar-buttons hover-over-buttons">
+        📸
+    </button>
+</a>
+{% endblock %}
+
+
+{% block main %} <!--<main name="main" id="main">-->
+    <div id="top-action-bar">
+        <div id="open-sidebar-div">
+            <button id="open-sidebar" class="open-sidebar hover-over-buttons">
+                ☰
+            </button>
+        </div>
+    </div>
+
+    <div id="main-body">
+        <button type="button" id="startCamButton">
+            <h5>
+                Camera
+            </h5>
+        </button>
+
+        <div id="TM-Wrapper">
+            <div id="webcam-container">
+            </div>
+            <div id="label-container">
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="{% static 'css/API/Camera/Brad_Hall/BHallCam.css' %}">
+
+    <script type="module" src="{% static 'js/basehtml/sidebar/open.js' %}"></script>
+    <script type="module" src="{% static 'js/basehtml/sidebar/resize.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.11.0/dist/tf-backend-wasm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script type="module" src="{% static 'js/APIs/Camera/Hall_For_Brad/hallCamBrad.js' %}"></script>
+{% endblock %}
+

@@ -1,4 +1,4 @@
-import { sidebarHandle, sidebar } from "./globalVars.js";
+import { sidebarHandle, sidebar } from "../../globalVars.js"; //from grandparent folder
 
 let beingDragged = false;
 let startingMouseX = 0;

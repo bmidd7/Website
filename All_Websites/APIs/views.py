@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.contrib.auth.decorators import login_required
@@ -10,10 +11,22 @@ def Control(request):
     return render(request, 'API/TEMP_index.html')
 
 
+@login_required
+def camera(request):
+    return render(request, 'API/camera.html')
+
+
+def control_redirect(request):
+    return redirect('/API/Control')
+
 
 def ping(request):
     return HttpResponse("pong")
 
+
+@api_view(['GET'])
+def WiFi_check(request):
+    return Response(True)
 
 @api_view(['POST'])
 def rgb_endpoint(request):

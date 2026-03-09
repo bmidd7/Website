@@ -45,7 +45,7 @@ class UserPreferences(models.Model):
             'accent_color': '#b58900'
         }
     }
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='preferences')
     notifications_on = models.BooleanField(default=False)
     
     
