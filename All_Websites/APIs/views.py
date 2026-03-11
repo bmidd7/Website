@@ -1,8 +1,8 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.shortcuts import redirect
 from rest_framework.response import Response
+from django.shortcuts import render, redirect
 from rest_framework.decorators import api_view
+from django.contrib.staticfiles import finders
+from django.http import HttpResponse, FileResponse
 from django.contrib.auth.decorators import login_required
 
 
@@ -39,3 +39,7 @@ def rgb_endpoint(request):
     # LedColor.objects.create(r=data['r'], g=data['g'], b=data['b'])
 
     return Response({"status": "ok", "received": data})
+
+def download_file(request):
+    file_path = finders.find("img/speedtest.bin")
+    return FileResponse(open(file_path, "rb"), as_attachment=True) # type:ignore

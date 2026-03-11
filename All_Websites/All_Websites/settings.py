@@ -72,7 +72,8 @@ INSTALLED_APPS = [
     #My Apps
     'MainHub',
     'Accounts',
-    'APIs'
+    'APIs',
+    'School',
 ]
 
 MIDDLEWARE = [

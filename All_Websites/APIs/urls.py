@@ -9,5 +9,6 @@ urlpatterns = [
     path('WiFi/', views.WiFi_check, name="WiFiCheck"),
     path('ESP32/RGB/', views.rgb_endpoint, name="RGB_API"),
     path('Camera/', views.camera, name="camera"),
-    path('ping/', views.ping, name="HTTP_Ping_Pong")
+    path('ping/', views.ping, name="HTTP_Ping_Pong"),
+    path('20MB/', views.download_file, name="File_Download"),
 ]
