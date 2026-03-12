@@ -3,7 +3,7 @@
 
 
 {% block title %}
-    Hub
+    Chemistry
 {% endblock %}
 
 {% block app-specific-logo-in-sidebar %}
@@ -14,7 +14,7 @@
 
 
 {% block main %} <!--<main name="main" id="main">-->
-    <div id="header">
+    <header id="header">
         <div id="open-sidebar-div">
             <button id="open-sidebar" class="open-sidebar hover-over-buttons">
                 ☰
@@ -26,57 +26,80 @@
                 ⚙
             </button>
         </div>
-    </div>
+    </header>
 
 
-    <div id="main-forreal">
-        <div id="givens">
-            <legend id="givens-legend">
-                Givens
-            </legend>
-
-            <div id="before-given">
-                <legend id="after-given-legend">
-                    Before
+    <main id="main">
+        <div id="givens-container">
+            <div id="givens">
+                <legend id="givens-legend">
+                    Givens
                 </legend>
-                <div id="before-given-type-text-div">
-                    <label>
-                        <input type="text" id="before-volume-given">
-                        Volume
-                    </label>
-                    <label>
-                        <input type="text" id="before-pressure-given">
-                        Pressure
-                    </label>
-                    <label>
-                        <input type="text">
-                        Temperature
-                    </label>
-                </div>
-            </div>
 
-            <div id="after-given">
-                <legend id="after-given-legend">
-                    After
-                </legend>
-                <div id="after-given-type-text-div">
-                    <label>
-                        <input type="text">
-                        Volume
-                    </label>
-                    <label>
-                        <input type="text">
-                        Pressure
-                    </label>
-                    <label>
-                        <input type="text">
-                        Temperature
-                    </label>
+
+                <div id="givens-wrapper">
+                    <div id="before-givens">
+                        <legend id="before-given-legend">
+                            Before
+                        </legend>
+                        <div id="before-given-type-text-div" class="givens-grid">
+                            <div class="grid-corner"></div>
+                            <div class="grid-header">Amount</div>
+                            <div class="grid-header">Unit</div>
+
+                            <div class="grid-label">Volume</div>
+                            <input type="number" min="0" id="before-volume-given">
+                            <select id="before-volume-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                            </select>
+
+                            <div class="grid-label">Pressure</div>
+                            <input type="number" min="0" id="before-pressure-given">
+                            <select id="before-pressure-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                            </select>
+
+                            <div class="grid-label">Temperature</div>
+                            <input type="number" id="before-temperature-given">
+                            <select id="before-temperature-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="after-givens">
+                        <legend id="after-given-legend">
+                            After
+                        </legend>
+                        <div id="after-given-type-text-div" class="givens-grid">
+                            <div class="grid-corner"></div>
+                            <div class="grid-header">Amount</div>
+                            <div class="grid-header">Unit</div>
+
+                            <div class="grid-label">Volume</div>
+                            <input type="number" min="0" id="after-volume-given">
+                            <select id="after-volume-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                            </select>
+
+                            <div class="grid-label">Pressure</div>
+                            <input type="number" min="0" id="after-pressure-given">
+                            <select id="after-pressure-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                            </select>
+
+                            <div class="grid-label">Temperature</div>
+                            <input type="number" id="after-temperature-given">
+                            <select id="after-temperature-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <link rel="stylesheet" href="{% static 'css/Hub/userHub.css' %}">
+    <link rel="stylesheet" href="{% static 'css/School/Chem.css' %}">
 {% endblock %}
 

@@ -1,0 +1,59 @@
+#main-wrapper{
+    flex-grow: 1;
+}
+
+#header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#givens-container {
+    width: 100%;
+    height: var(--givens-height, auto);
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+#givens {
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+}
+
+#givens-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+#after-given-legend{
+    text-justify: center;
+}
+
+#before-given-legend,
+#after-given-legend {
+    text-align: center;
+}
+
+.givens-grid {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) minmax(160px, 1.2fr) minmax(140px, 1fr);
+    grid-auto-rows: minmax(36px, auto);
+    column-gap: 12px;
+    row-gap: 10px;
+    align-items: center;
+}
+
+.givens-grid .grid-header {
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.givens-grid input,
+.givens-grid select {
+    width: 100%;
+}
