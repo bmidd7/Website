@@ -3,7 +3,7 @@
 
 
 {% block title %}
-    Chemistry
+    Gases Calculations
 {% endblock %}
 
 {% block app-specific-logo-in-sidebar %}
@@ -34,6 +34,14 @@
             <div id="givens">
                 <legend id="givens-legend">
                     Givens
+                    <span
+                        class="givens-hint"
+                        data-tooltip="Enter '?' for unknown. Numbers can be decimals or scientific notation (e.g., 1.2e-3)."
+                        aria-label="Givens help"
+                        tabindex="0"
+                    >
+                        ?
+                    </span>
                 </legend>
 
 
@@ -48,21 +56,42 @@
                             <div class="grid-header">Unit</div>
 
                             <div class="grid-label">Volume</div>
-                            <input type="number" min="0" id="before-volume-given">
+                            <input type="text" value="?" id="before-volume-given">
                             <select id="before-volume-unit-given">
                                 <option value="" disabled selected>Select unit</option>
+                                <option value="Liters">L</option>
+                                <option value="Milliliters">mL</option>
+                                <option value="Cubic Centimeters">cm³</option>
                             </select>
 
                             <div class="grid-label">Pressure</div>
-                            <input type="number" min="0" id="before-pressure-given">
+                            <input type="text" value="?" id="before-pressure-given">
                             <select id="before-pressure-unit-given">
                                 <option value="" disabled selected>Select unit</option>
+                                <option value="Kilopascal">kPa</option>
+                                <option value="Pascal">Pa</option>
+                                <option value="Atmosphere">atm</option>
+                                <option value="Torr">Torr</option>
+                                <option value="mmHg">mmHg</option>
+                                <option value="PSI">PSI</option>
                             </select>
 
                             <div class="grid-label">Temperature</div>
-                            <input type="number" id="before-temperature-given">
+                            <input type="text" value="?" id="before-temperature-given">
                             <select id="before-temperature-unit-given">
                                 <option value="" disabled selected>Select unit</option>
+                                <option value="Celsius">°C</option>
+                                <option value="Kelvin">K</option>
+                                <option value="Fahrenheit">°F</option>
+                            </select>
+
+                            <div class="grid-label">Moles</div>
+                            <input type="text" value="?" id="before-temperature-given">
+                            <select id="before-temperature-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                                <option value="Celsius">°C</option>
+                                <option value="Kelvin">K</option>
+                                <option value="Fahrenheit">°F</option>
                             </select>
                         </div>
                     </div>
@@ -77,21 +106,33 @@
                             <div class="grid-header">Unit</div>
 
                             <div class="grid-label">Volume</div>
-                            <input type="number" min="0" id="after-volume-given">
+                            <input type="text" value="?" id="after-volume-given">
                             <select id="after-volume-unit-given">
                                 <option value="" disabled selected>Select unit</option>
+                                <option value="Liters">L</option>
+                                <option value="Milliliters">mL</option>
+                                <option value="Cubic Centimeters">cm³</option>
                             </select>
 
                             <div class="grid-label">Pressure</div>
-                            <input type="number" min="0" id="after-pressure-given">
+                            <input type="text" value="?" id="after-pressure-given">
                             <select id="after-pressure-unit-given">
                                 <option value="" disabled selected>Select unit</option>
+                                <option value="Kilopascal">kPa</option>
+                                <option value="Pascal">Pa</option>
+                                <option value="Atmosphere">atm</option>
+                                <option value="Torr">Torr</option>
+                                <option value="mmHg">mmHg</option>
+                                <option value="PSI">PSI</option>
                             </select>
 
                             <div class="grid-label">Temperature</div>
-                            <input type="number" id="after-temperature-given">
+                            <input type="text" value="?" id="after-temperature-given">
                             <select id="after-temperature-unit-given">
                                 <option value="" disabled selected>Select unit</option>
+                                <option value="Celsius">°C</option>
+                                <option value="Kelvin">°K</option>
+                                <option value="Fahrenheit">°F</option>
                             </select>
                         </div>
                     </div>
@@ -100,6 +141,13 @@
         </div>
     </main>
 
-    <link rel="stylesheet" href="{% static 'css/School/Chem.css' %}">
-{% endblock %}
+    <!--For Select2-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+
+    <!--Mine-->
+    <link rel="stylesheet" href="{% static 'css/School/Chem.css' %}">
+
+    <script type="module" src="{% static 'js/School/Chem/Gases.js' %}"></script>
+{% endblock %}

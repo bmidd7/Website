@@ -1,3 +1,5 @@
+
+
 //GB...  (Given (Before), Type, Unit/)
 const GBV = [
   document.getElementById("before-volume-given").value,
@@ -26,4 +28,42 @@ const GAT = [
   document.getElementById("after-temperature-unit-given").value,
 ];
 
-for 
+const DEFAULT_AMOUNT_VALUE = "?";
+const NUMBER_PATTERN = /^-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/;
+const amountInputs = document.querySelectorAll("#givens input[type=\"text\"]");
+
+const validateAmountInput = (input) => {
+  const value = input.value.trim();
+
+  if (value === "" || value === DEFAULT_AMOUNT_VALUE) {
+    input.setCustomValidity("");
+    return;
+  }
+
+  if (value === "?" || NUMBER_PATTERN.test(value)) {
+    input.setCustomValidity("");
+  } else {
+    input.setCustomValidity("Enter a number or ?.");
+  }
+};
+
+amountInputs.forEach((input) => {
+  input.addEventListener("focus", () => {
+    if (input.value === DEFAULT_AMOUNT_VALUE) {
+      input.select();
+    }
+  });
+
+  input.addEventListener("input", () => {
+    validateAmountInput(input);
+  });
+
+  input.addEventListener("blur", () => {
+    if (input.value.trim() === "") {
+      input.value = DEFAULT_AMOUNT_VALUE;
+    }
+    validateAmountInput(input);
+    input.reportValidity();
+  });
+});
+
