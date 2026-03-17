@@ -85,13 +85,12 @@
                                 <option value="Fahrenheit">°F</option>
                             </select>
 
-                            <div class="grid-label">Moles</div>
-                            <input type="text" value="?" id="before-temperature-given">
-                            <select id="before-temperature-unit-given">
+                            <div class="grid-label">Particle Amount</div>
+                            <input type="text" value="?" id="before-particles-given">
+                            <select id="before-particles-unit-given">
                                 <option value="" disabled selected>Select unit</option>
-                                <option value="Celsius">°C</option>
-                                <option value="Kelvin">K</option>
-                                <option value="Fahrenheit">°F</option>
+                                <option value="Moles">mol</option>
+                                <option value="Grams">g</option>
                             </select>
                         </div>
                     </div>
@@ -134,6 +133,14 @@
                                 <option value="Kelvin">°K</option>
                                 <option value="Fahrenheit">°F</option>
                             </select>
+
+                            <div class="grid-label">Particle Amount</div>
+                            <input type="text" value="?" id="after-particles-given">
+                            <select id="after-particles-unit-given">
+                                <option value="" disabled selected>Select unit</option>
+                                <option value="Moles">mol</option>
+                                <option value="Grams">g</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -142,6 +149,7 @@
     </main>
 
     <!--For Select2-->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -149,5 +157,5 @@
     <!--Mine-->
     <link rel="stylesheet" href="{% static 'css/School/Chem.css' %}">
 
-    <script type="module" src="{% static 'js/School/Chem/Gases.js' %}"></script>
+    <script type="module" src="{% static 'js/School/Chem/Gases/Gases.js' %}"></script>
 {% endblock %}
