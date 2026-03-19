@@ -1,4 +1,7 @@
-const startCamButton = document.getElementById("startCamButton");
+declare const tf: any;
+declare const tmImage: any;
+
+const startCamButton = document.getElementById("startCamButton") as HTMLButtonElement;
 let isInitializing = false;
 let isStarted = false;
 
@@ -8,7 +11,7 @@ startCamButton.addEventListener("click", init);
 // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
 
 // the link to your model provided by Teachable Machine export panel
-const URL = "https://teachablemachine.withgoogle.com/models/upiTOButL/";
+const MyURL = "https://teachablemachine.withgoogle.com/models/upiTOButL/";
 
 let model, webcam, labelContainer, maxPredictions;
 
@@ -33,8 +36,8 @@ async function init() {
       await tf.ready();
     }
 
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
+    const modelURL = MyURL + "model.json";
+    const metadataURL = MyURL + "metadata.json";
 
     // load the model and metadata
     // Refer to tmImage.loadFromFiles() in the API to support files from a file picker

@@ -1,9 +1,14 @@
 {
-    "compilerOptions": {
-      "rootDir": "./static/ts",
-      "outDir": "./static/js",
-      "target": "ES6",
-      "sourceMap": true
-    },
-    "include": ["./static/ts/**/*.ts"]
-  }
+  "compilerOptions": {
+    "rootDir": "./static/ts",
+    "outDir": "./static/js",
+    "target": "ES2020",
+    "sourceMap": true,
+    "lib": ["ES2020", "DOM"],
+    "module": "ES2020",
+    "moduleResolution": "Bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": ["./static/ts/**/*.ts"]
+}

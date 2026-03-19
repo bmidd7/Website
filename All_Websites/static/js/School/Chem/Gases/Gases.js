@@ -1,5 +1,7 @@
 import { boylesLawP, boylesLawV, charlesLawV, charlesLawT, gayLussacsLawP, gayLussacsLawT, avogadrosLawV, avogadrosLawN, } from "./gasFunctions.js";
 import { getGasInputs } from "./getGasInputs.js";
+import { convertInputs } from "./preConvertGases.js";
+import { defaultColors } from "./localModules.js";
 // PV=nRT
 // Known:
 // 0 = neither, 1 = both, b = before, a = after
@@ -29,27 +31,29 @@ function getWhatAreWeWorkingWith() {
         '0a10': avogadrosLawV(GAV[0], GAN[0], GBN[0]),
     };
 }
-function handleAmountInput() {
-    renderDivsFromList(itemsToRender);
+let numberOfEquations = 3;
+const givenInputs = document.querySelectorAll('#givens input, #givens select');
+// for (let i = 0; i < numberOfEquations; i++) {
+//   const newDiv = document.createElement('div')
+//   newDiv.id = `equation${i + 1}`
+//   equationsContainer.appendChild(newDiv)
+//   const equationDiv = document.getElementById(`equation${i + 1}`) as HTMLDivElement
+//   equationDiv.textContent = 'Hi!'
+// }
+const equationsContainer = document.getElementById('equations');
+function renderEquations() {
+    equationsContainer.innerHTML = '';
+    convertInputs(equationsContainer, getGasInputs().GBT, [...defaultColors]);
 }
-function renderDivsFromList(items) {
-    listContainer.replaceChildren();
-    items.forEach((item, index) => {
-        const myDiv = document.createElement('div');
-        myDiv.textContent = item;
-        myDiv.id = `item-div-${index}`;
-        listContainer.appendChild(myDiv);
-    });
-}
-let mainDiv = document.getElementById('main');
-const amountInputs = document.querySelectorAll('#givens input[type="text"]');
-const listContainer = document.createElement('div');
-listContainer.id = 'amount-list-divs';
-mainDiv.appendChild(listContainer);
-let itemsToRender = [];
-amountInputs.forEach((input) => {
-    input.addEventListener('input', handleAmountInput);
-    // Run once on load in case there are preset values.
-    handleAmountInput();
+givenInputs.forEach((input) => {
+    input.addEventListener('input', renderEquations);
+    input.addEventListener('change', renderEquations);
 });
+renderEquations();
+// for (let i = 0; i < numberOfEquations; i++) {
+//   const newDiv = document.createElement('div');
+//   newDiv.id = `equation${i + 1}`;
+//   newDiv.textContent = 'Hi!';
+//   equationsContainer.appendChild(newDiv);
+// }
 //# sourceMappingURL=Gases.js.map

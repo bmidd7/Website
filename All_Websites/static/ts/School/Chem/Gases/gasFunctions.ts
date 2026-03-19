@@ -86,3 +86,4 @@ export function idealGasLawT(givenP: number, givenV: number, givenN: number, pre
     let derivedTemperature = (givenP*givenV)/(R*givenN);
     return derivedTemperature;
 }
+

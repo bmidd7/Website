@@ -58,7 +58,7 @@
                             <div class="grid-label">Volume</div>
                             <input type="text" value="?" id="before-volume-given">
                             <select id="before-volume-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Liters">L</option>
                                 <option value="Milliliters">mL</option>
                                 <option value="Cubic Centimeters">cm³</option>
@@ -67,7 +67,7 @@
                             <div class="grid-label">Pressure</div>
                             <input type="text" value="?" id="before-pressure-given">
                             <select id="before-pressure-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Kilopascal">kPa</option>
                                 <option value="Pascal">Pa</option>
                                 <option value="Atmosphere">atm</option>
@@ -79,7 +79,7 @@
                             <div class="grid-label">Temperature</div>
                             <input type="text" value="?" id="before-temperature-given">
                             <select id="before-temperature-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Celsius">°C</option>
                                 <option value="Kelvin">K</option>
                                 <option value="Fahrenheit">°F</option>
@@ -88,7 +88,7 @@
                             <div class="grid-label">Particle Amount</div>
                             <input type="text" value="?" id="before-particles-given">
                             <select id="before-particles-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Moles">mol</option>
                                 <option value="Grams">g</option>
                             </select>
@@ -107,7 +107,7 @@
                             <div class="grid-label">Volume</div>
                             <input type="text" value="?" id="after-volume-given">
                             <select id="after-volume-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Liters">L</option>
                                 <option value="Milliliters">mL</option>
                                 <option value="Cubic Centimeters">cm³</option>
@@ -116,7 +116,7 @@
                             <div class="grid-label">Pressure</div>
                             <input type="text" value="?" id="after-pressure-given">
                             <select id="after-pressure-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Kilopascal">kPa</option>
                                 <option value="Pascal">Pa</option>
                                 <option value="Atmosphere">atm</option>
@@ -128,7 +128,7 @@
                             <div class="grid-label">Temperature</div>
                             <input type="text" value="?" id="after-temperature-given">
                             <select id="after-temperature-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Celsius">°C</option>
                                 <option value="Kelvin">°K</option>
                                 <option value="Fahrenheit">°F</option>
@@ -137,7 +137,7 @@
                             <div class="grid-label">Particle Amount</div>
                             <input type="text" value="?" id="after-particles-given">
                             <select id="after-particles-unit-given">
-                                <option value="" disabled selected>Select unit</option>
+                                <option value="Default" disabled selected>Select unit</option>
                                 <option value="Moles">mol</option>
                                 <option value="Grams">g</option>
                             </select>
@@ -146,6 +146,11 @@
                 </div>
             </div>
         </div>
+
+
+        <div id="equations">
+            
+        </div>
     </main>
 
     <!--For Select2-->
@@ -153,6 +158,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    <!-- For KaTeX-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 
     <!--Mine-->
     <link rel="stylesheet" href="{% static 'css/School/Chem.css' %}">

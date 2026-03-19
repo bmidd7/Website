@@ -80,7 +80,7 @@ if (sidebarOpenButton) {
 
 //Checks if button is hovered over and adds outline
 document.addEventListener("mouseover", (event) => {
-  const button = event.target.closest(".hover-over-buttons");
+  const button = (event.target as HTMLButtonElement).closest(".hover-over-buttons");
   if (button) {  // If the button supports an outline,
     button.classList.add("moused-over"); // Add outline class
     console.log(`${event.target} has been hovered over!`); // Log it!
@@ -89,7 +89,7 @@ document.addEventListener("mouseover", (event) => {
 
 //Checks if button is hovered over and removes outline
 document.addEventListener("mouseout", (event) => {
-  const button = event.target.closest(".hover-over-buttons");
+  const button = (event.target as HTMLButtonElement).closest(".hover-over-buttons");
   if (button) {  // If the button supports an outline,
     button.classList.remove("moused-over"); // Remove outline class
     console.log(`${event.target} has been un-hovered over!`); // Log it!

@@ -8,8 +8,8 @@ export const sidebarHandle = document.getElementById("sidebar-handle");
 export const webAddressWithEndSlash =
   "https://isreal-brainy-irreclaimably.ngrok-free.dev/";
 
-export const GPU = !!navigator.gpu;
-export const RAM = navigator.deviceMemory;
+export const GPU = !!(navigator as any).gpu;
+export const RAM: number = (navigator as any).deviceMemory;
 export const CPUCores = navigator.hardwareConcurrency;
 
 export async function hasWiFi(retries = 3, delay = 500) {

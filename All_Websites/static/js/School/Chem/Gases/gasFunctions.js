@@ -46,7 +46,7 @@ export function findR(pressureUnit) {
     else if (pressureUnit === "Atmosphere") {
         return 0.0821;
     }
-    else if (pressureUnit === "mmHg") {
+    else { //(pressureUnit === "mmHg")
         return 62.36;
     }
 }
