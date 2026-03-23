@@ -1,7 +1,7 @@
 const DEFAULT_AMOUNT_VALUE = "?";
 const NUMBER_PATTERN = /^-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/; // scientific notation allowed
 const GAS_INPUTS_COOKIE_NAME = "gases-page-inputs";
-const GAS_INPUTS_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 2.5;
+const GAS_INPUTS_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 2.5; // 60 seconds * 60 minutes * 2.5 hours = 2.5 hours!
 // Collect all input fields for validation
 const amountInputs = document.querySelectorAll('#givens input[type="text"]');
 const gasFormFields = document.querySelectorAll("#givens input, #givens select");
@@ -150,6 +150,64 @@ amountSelects.forEach((select) => {
 restoreGasInputsFromCookie();
 refreshGasInputs();
 saveGasInputsCookie();
-export function convertToQuadernary() {
+export function get4DigitCode() {
+    const { GBV, GBP, GBT, GBN, GAV, GAP, GAT, GAN } = getGasInputs();
+    function digit1(GBP, GAP) {
+        if (GBP[0] === null && GAP[0] === null) {
+            return "0";
+        }
+        else if (GBP[0] !== null && GAP[0] !== null) {
+            return "1";
+        }
+        else if (GBP[0] !== null && GAP[0] === null) {
+            return "b";
+        }
+        else {
+            return "a";
+        }
+    }
+    function digit2(GBV, GAV) {
+        if (GBV[0] === null && GAV[0] === null) {
+            return "0";
+        }
+        else if (GBV[0] !== null && GAV[0] !== null) {
+            return "1";
+        }
+        else if (GBV[0] !== null && GAV[0] === null) {
+            return "b";
+        }
+        else {
+            return "a";
+        }
+    }
+    function digit3(GBN, GAN) {
+        if (GBN[0] === null && GAN[0] === null) {
+            return "0";
+        }
+        else if (GBN[0] !== null && GAN[0] !== null) {
+            return "1";
+        }
+        else if (GBN[0] !== null && GAN[0] === null) {
+            return "b";
+        }
+        else {
+            return "a";
+        }
+    }
+    function digit4(GBT, GAT) {
+        if (GBT[0] === null && GAT[0] === null) {
+            return "0";
+        }
+        else if (GBT[0] !== null && GAT[0] !== null) {
+            return "1";
+        }
+        else if (GBT[0] !== null && GAT[0] === null) {
+            return "b";
+        }
+        else {
+            return "a";
+        }
+    }
+    return `${digit1(GBP, GAP)}${digit2(GBV, GAV)}${digit3(GBN, GAN)}${digit4(GBT, GAT)}`;
 }
 //# sourceMappingURL=getGasInputs.js.map

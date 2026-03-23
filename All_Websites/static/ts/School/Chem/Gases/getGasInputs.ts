@@ -1,7 +1,9 @@
+import { InputArray } from './localModules'
+
 const DEFAULT_AMOUNT_VALUE = "?";
 const NUMBER_PATTERN = /^-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/; // scientific notation allowed
 const GAS_INPUTS_COOKIE_NAME = "gases-page-inputs";
-const GAS_INPUTS_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 2.5;
+const GAS_INPUTS_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 2.5; // 60 seconds * 60 minutes * 2.5 hours = 2.5 hours!
 
 // Collect all input fields for validation
 const amountInputs = document.querySelectorAll<HTMLInputElement>('#givens input[type="text"]');
@@ -109,7 +111,7 @@ function fixInputUnit(unit: string) {
   }
 }
 
-function getInputPair(valueId: string, unitId: string): [number | null, string | null] {
+function getInputPair(valueId: string, unitId: string): InputArray {
   const valueInput: HTMLInputElement =  document.getElementById(valueId) as HTMLInputElement
   const unitInput: HTMLInputElement = document.getElementById(unitId) as HTMLInputElement
   return [
@@ -118,14 +120,14 @@ function getInputPair(valueId: string, unitId: string): [number | null, string |
   ];
 }
 
-export let GBV: [number | null, string | null] = [null, null];
-export let GBP: [number | null, string | null] = [null, null];
-export let GBT: [number | null, string | null] = [null, null];
-export let GBN: [number | null, string | null] = [null, null];
-export let GAV: [number | null, string | null] = [null, null];
-export let GAP: [number | null, string | null] = [null, null];
-export let GAT: [number | null, string | null] = [null, null];
-export let GAN: [number | null, string | null] = [null, null];
+export let GBV: InputArray = [null, null];
+export let GBP: InputArray = [null, null];
+export let GBT: InputArray = [null, null];
+export let GBN: InputArray = [null, null];
+export let GAV: InputArray = [null, null];
+export let GAP: InputArray = [null, null];
+export let GAT: InputArray = [null, null];
+export let GAN: InputArray = [null, null];
 
 export function refreshGasInputs() {
   GBV = getInputPair("before-volume-given", "before-volume-unit-given");
@@ -186,6 +188,56 @@ restoreGasInputsFromCookie();
 refreshGasInputs();
 saveGasInputsCookie();
 
-export function convertToQuadernary() {
-    
+export function get4DigitCode() {
+  const { GBV, GBP, GBT, GBN, GAV, GAP, GAT, GAN } = getGasInputs();
+
+  function digit1(GBP: InputArray, GAP: InputArray) {
+    if (GBP[0] === null && GAP[0] === null) {
+      return "0";
+    } else if (GBP[0] !== null && GAP[0] !== null) {
+      return "1";
+    } else if (GBP[0] !== null && GAP[0] === null) {
+      return "b";
+    } else {
+      return "a";
+    }
+  }
+
+  function digit2(GBV: InputArray, GAV: InputArray) {
+    if (GBV[0] === null && GAV[0] === null) {
+      return "0";
+    } else if (GBV[0] !== null && GAV[0] !== null) {
+      return "1";
+    } else if (GBV[0] !== null && GAV[0] === null) {
+      return "b";
+    } else {
+      return "a";
+    }
+  }
+
+  function digit3(GBN: InputArray, GAN: InputArray) {
+    if (GBN[0] === null && GAN[0] === null) {
+      return "0";
+    } else if (GBN[0] !== null && GAN[0] !== null) {
+      return "1";
+    } else if (GBN[0] !== null && GAN[0] === null) {
+      return "b";
+    } else {
+      return "a";
+    }
+  }
+
+  function digit4(GBT: InputArray, GAT: InputArray) {
+    if (GBT[0] === null && GAT[0] === null) {
+      return "0";
+    } else if (GBT[0] !== null && GAT[0] !== null) {
+      return "1";
+    } else if (GBT[0] !== null && GAT[0] === null) {
+      return "b";
+    } else {
+      return "a";
+    }
+  }
+
+  return `${digit1(GBP, GAP)}${digit2(GBV, GAV)}${digit3(GBN, GAN)}${digit4(GBT, GAT)}`;
 }

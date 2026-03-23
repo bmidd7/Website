@@ -4,7 +4,6 @@ export let defaultColors = [
     "#008000",
     "#66CCAB",
     "#00BFFF",
-    "#FF00FF",
     "#FF4500",
     "#4A0082",
     "#008080",
@@ -25,20 +24,20 @@ export function removeColor(colorList, numberUsed = 1) {
         }
     }
 }
-export function breadthFirstSearch(start) {
-    const queue = [start];
-    const visited = new Set([start]);
-    while (queue.length > 0) {
-        const node = queue.shift();
-        console.log(node);
-        for (const neighbor of node.neighbors) {
-            if (!visited.has(neighbor)) {
-                visited.add(neighbor);
-                queue.push(neighbor);
-            }
-        }
-    }
-}
+// export function breadthFirstSearch(start) {
+//   const queue = [start];
+//   const visited = new Set([start]);
+//   while (queue.length > 0) {
+//     const node = queue.shift();
+//     console.log(node);
+//     for (const neighbor of node.neighbors) {
+//       if (!visited.has(neighbor)) {
+//         visited.add(neighbor);
+//         queue.push(neighbor);
+//       }
+//     }
+//   }
+// }
 // document.addEventListener('DOMContentLoaded', () => {
 //   export const equationsContainer = document.getElementById('equations') as HTMLDivElement;
 // });

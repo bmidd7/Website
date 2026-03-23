@@ -3,7 +3,11 @@
 
 
 {% block title %}
-    Hub
+Main Page
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static 'css/Hub/userHub.css' %}">
 {% endblock %}
 
 {% block app-specific-logo-in-sidebar %}
@@ -13,14 +17,18 @@
 {% endblock %}
 
 
-{% block main %} <!--<main name="main" id="main">-->
+{% block main %} <!--<main name="main-wrapper" id="main-wrapper">-->
+<div>
     <div id="open-sidebar-div">
         <button id="open-sidebar" class="open-sidebar hover-over-buttons">
             ☰
         </button>
     </div>
-    <h5>Welcome to Brad's Regular User Hub</h5>
+        
+    <canvas id="canvas"></canvas>
+    <div id="orb"></div>
 
-    <link rel="stylesheet" href="{% static 'css/Hub/userHub.css' %}">
+</div>
 {% endblock %}
 
+<script src="{% static 'js/Hub/tendrils.js' %}"></script>

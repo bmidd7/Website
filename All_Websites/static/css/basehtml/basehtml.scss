@@ -7,6 +7,12 @@ $default-font: YuGothicUI-Bold;
 $text-color: black;
 
 
+body {
+    margin: 0;
+    padding: 0;
+}
+
+
 .TEST {
     background-color: pink;
 }
@@ -26,8 +32,7 @@ $text-color: black;
 }
 
 
-
-#main {
+#main-wrapper {
     flex-grow: 1;
     min-width: 0;
     padding: 2px;

@@ -1,169 +1,177 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block title %} Gases Calculations
+{% endblock %} {% block app-specific-logo-in-sidebar %}
+<a> </a>
+{% endblock %} {% block main %}
+<!--<main name="main" id="main">-->
+<header id="header">
+  <div id="open-sidebar-div">
+    <button id="open-sidebar" class="open-sidebar hover-over-buttons">
+      ☰
+    </button>
+  </div>
 
+  <div id="open-app-settings">
+    <button>⚙</button>
+  </div>
+</header>
 
-{% block title %}
-    Gases Calculations
-{% endblock %}
+<main id="main">
+  <div id="givens-container">
+    <div id="givens">
+      <legend id="givens-legend">
+        Givens
+        <span
+          class="givens-hint"
+          data-tooltip="Enter '?' for unknown. Numbers can be decimals or scientific notation (e.g., 1.2e-3)."
+          aria-label="Givens help"
+          tabindex="0"
+        >
+          ?
+        </span>
+      </legend>
 
-{% block app-specific-logo-in-sidebar %}
-<a>
+      <div id="givens-wrapper">
+        <div id="before-givens">
+          <legend id="before-given-legend">Before</legend>
+          <div id="before-given-type-text-div" class="givens-grid">
+            <div class="grid-corner"></div>
+            <div class="grid-header">Amount</div>
+            <div class="grid-header">Unit</div>
 
-</a>
-{% endblock %}
+            <div class="grid-label">Volume</div>
+            <input type="text" value="?" id="before-volume-given" />
+            <select id="before-volume-unit-given">
+              <option value="Default" disabled selected>Select unit</option>
+              <option value="Liters">L</option>
+              <option value="Milliliters">mL</option>
+              <option value="Cubic Centimeters">cm³</option>
+            </select>
 
+            <div class="grid-label">Pressure</div>
+            <input type="text" value="?" id="before-pressure-given" />
+            <select id="before-pressure-unit-given">
+              <option value="Default" disabled selected>Select unit</option>
+              <option value="Kilopascal">kPa</option>
+              <option value="Pascal">Pa</option>
+              <option value="Atmosphere">atm</option>
+              <option value="Torr">Torr</option>
+              <option value="mmHg">mmHg</option>
+            </select>
 
-{% block main %} <!--<main name="main" id="main">-->
-    <header id="header">
-        <div id="open-sidebar-div">
-            <button id="open-sidebar" class="open-sidebar hover-over-buttons">
-                ☰
-            </button>
-        </div>
+            <div class="grid-label">Temperature</div>
+            <input type="text" value="?" id="before-temperature-given" />
+            <select id="before-temperature-unit-given">
+              <option value="Default" disabled selected>Select unit</option>
+              <option value="Celsius">°C</option>
+              <option value="Kelvin">K</option>
+              <option value="Fahrenheit">°F</option>
+            </select>
 
-        <div id="open-app-settings">
-            <button>
-                ⚙
-            </button>
-        </div>
-    </header>
-
-
-    <main id="main">
-        <div id="givens-container">
-            <div id="givens">
-                <legend id="givens-legend">
-                    Givens
-                    <span
-                        class="givens-hint"
-                        data-tooltip="Enter '?' for unknown. Numbers can be decimals or scientific notation (e.g., 1.2e-3)."
-                        aria-label="Givens help"
-                        tabindex="0"
-                    >
-                        ?
-                    </span>
-                </legend>
-
-
-                <div id="givens-wrapper">
-                    <div id="before-givens">
-                        <legend id="before-given-legend">
-                            Before
-                        </legend>
-                        <div id="before-given-type-text-div" class="givens-grid">
-                            <div class="grid-corner"></div>
-                            <div class="grid-header">Amount</div>
-                            <div class="grid-header">Unit</div>
-
-                            <div class="grid-label">Volume</div>
-                            <input type="text" value="?" id="before-volume-given">
-                            <select id="before-volume-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Liters">L</option>
-                                <option value="Milliliters">mL</option>
-                                <option value="Cubic Centimeters">cm³</option>
-                            </select>
-
-                            <div class="grid-label">Pressure</div>
-                            <input type="text" value="?" id="before-pressure-given">
-                            <select id="before-pressure-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Kilopascal">kPa</option>
-                                <option value="Pascal">Pa</option>
-                                <option value="Atmosphere">atm</option>
-                                <option value="Torr">Torr</option>
-                                <option value="mmHg">mmHg</option>
-                                <option value="PSI">PSI</option>
-                            </select>
-
-                            <div class="grid-label">Temperature</div>
-                            <input type="text" value="?" id="before-temperature-given">
-                            <select id="before-temperature-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Celsius">°C</option>
-                                <option value="Kelvin">K</option>
-                                <option value="Fahrenheit">°F</option>
-                            </select>
-
-                            <div class="grid-label">Particle Amount</div>
-                            <input type="text" value="?" id="before-particles-given">
-                            <select id="before-particles-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Moles">mol</option>
-                                <option value="Grams">g</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="after-givens">
-                        <legend id="after-given-legend">
-                            After
-                        </legend>
-                        <div id="after-given-type-text-div" class="givens-grid">
-                            <div class="grid-corner"></div>
-                            <div class="grid-header">Amount</div>
-                            <div class="grid-header">Unit</div>
-
-                            <div class="grid-label">Volume</div>
-                            <input type="text" value="?" id="after-volume-given">
-                            <select id="after-volume-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Liters">L</option>
-                                <option value="Milliliters">mL</option>
-                                <option value="Cubic Centimeters">cm³</option>
-                            </select>
-
-                            <div class="grid-label">Pressure</div>
-                            <input type="text" value="?" id="after-pressure-given">
-                            <select id="after-pressure-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Kilopascal">kPa</option>
-                                <option value="Pascal">Pa</option>
-                                <option value="Atmosphere">atm</option>
-                                <option value="Torr">Torr</option>
-                                <option value="mmHg">mmHg</option>
-                                <option value="PSI">PSI</option>
-                            </select>
-
-                            <div class="grid-label">Temperature</div>
-                            <input type="text" value="?" id="after-temperature-given">
-                            <select id="after-temperature-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Celsius">°C</option>
-                                <option value="Kelvin">°K</option>
-                                <option value="Fahrenheit">°F</option>
-                            </select>
-
-                            <div class="grid-label">Particle Amount</div>
-                            <input type="text" value="?" id="after-particles-given">
-                            <select id="after-particles-unit-given">
-                                <option value="Default" disabled selected>Select unit</option>
-                                <option value="Moles">mol</option>
-                                <option value="Grams">g</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid-label">Particle Amount</div>
+            <input type="text" value="?" id="before-particles-given" />
+            <div id="before-mol-gram-input-div">
+              <div id="before-amount-unit-select">
+                <select id="before-particles-unit-given">
+                  <option value="Default" disabled selected>Select unit</option>
+                  <option value="Moles">mol</option>
+                  <option value="Grams">g</option>
+                </select>
+              </div>
+              <div id="before-amount-grams" class="hidden">
+                of
+                <select id="before-gram-select"></select>
+              </div>
             </div>
+          </div>
         </div>
 
+        <div id="after-givens">
+          <legend id="after-given-legend">After</legend>
+          <div id="after-given-type-text-div" class="givens-grid">
+            <div class="grid-corner"></div>
+            <div class="grid-header">Amount</div>
+            <div class="grid-header">Unit</div>
 
-        <div id="equations">
-            
+            <div class="grid-label">Volume</div>
+            <input type="text" value="?" id="after-volume-given" />
+            <select id="after-volume-unit-given">
+              <option value="Default" disabled selected>Select unit</option>
+              <option value="Liters">L</option>
+              <option value="Milliliters">mL</option>
+              <option value="Cubic Centimeters">cm³</option>
+            </select>
+
+            <div class="grid-label">Pressure</div>
+            <input type="text" value="?" id="after-pressure-given" />
+            <select id="after-pressure-unit-given">
+              <option value="Default" disabled selected>Select unit</option>
+              <option value="Kilopascal">kPa</option>
+              <option value="Pascal">Pa</option>
+              <option value="Atmosphere">atm</option>
+              <option value="Torr">Torr</option>
+              <option value="mmHg">mmHg</option>
+            </select>
+
+            <div class="grid-label">Temperature</div>
+            <input type="text" value="?" id="after-temperature-given" />
+            <select id="after-temperature-unit-given">
+              <option value="Default" disabled selected>Select unit</option>
+              <option value="Celsius">°C</option>
+              <option value="Kelvin">°K</option>
+              <option value="Fahrenheit">°F</option>
+            </select>
+
+            <div class="grid-label">Particle Amount</div>
+            <input type="text" value="?" id="after-particles-given" />
+            <div id="after-mol-gram-input-div">
+              <div id="after-amount-unit-select">
+                <select id="after-particles-unit-given">
+                  <option value="Default" disabled selected>Select unit</option>
+                  <option value="Moles">mol</option>
+                  <option value="Grams">g</option>
+                </select>
+              </div>
+              <div id="after-amount-grams" class="hidden">
+                of
+                <select id="after-gram-select"></select>
+              </div>
+            </div>
+          </div>
         </div>
-    </main>
+      </div>
+    </div>
+  </div>
 
-    <!--For Select2-->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <div id="equations"></div>
+</main>
 
-    <!-- For KaTeX-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<!--For Select2-->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <!--Mine-->
-    <link rel="stylesheet" href="{% static 'css/School/Chem.css' %}">
+<!-- For KaTeX-->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+/>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+></script>
 
-    <script type="module" src="{% static 'js/School/Chem/Gases/Gases.js' %}"></script>
+<!--Mine-->
+<link rel="stylesheet" href="{% static 'css/School/Chem.css' %}" />
+
+<script
+  type="module"
+  src="{% static 'js/School/Chem/Gases/Gases.js' %}"
+></script>
+<script
+  type="module"
+  src="{% static 'js/School/Chem/Gases/showAndHideParticleSelect.js' %}"
+></script>
 {% endblock %}

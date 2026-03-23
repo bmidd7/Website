@@ -6,11 +6,15 @@
         <meta charset="utf-8">
 
         <link rel="shortcut icon" type="image/ico" href="{% static 'img/favicon.ico' %}">
+        <link rel="stylesheet" href="{% static 'css/basehtml/basehtml.css' %}?v=20260322b">
 
         <title>
             {% block title %}
             {% endblock %}
         </title>
+
+        {% block extra-css %}
+        {% endblock %}
     </head>
 
 
@@ -86,7 +90,7 @@
 
         <script type="module" src="{% static 'js/basehtml/sidebar/open.js' %}"></script>
         <script type="module" src="{% static 'js/basehtml/sidebar/resize.js' %}"></script>
-
-        <link rel="stylesheet" href="{% static 'css/basehtml/basehtml.css' %}">
+        {% block extra_js %}
+        {% endblock %}
     </body>
 </html>
