@@ -4,7 +4,15 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def DefaultHub(request):
-    return render(request, 'Hub/userHub/index.html')
+    username = None
+    if request.user.is_authenticated:
+        username = request.user.username
+
+    context = {
+        'username': username,
+    }
+
+    return render(request, 'Hub/userHub/index.html', context)
 
 # @login_required
 # def AdminHub(request):

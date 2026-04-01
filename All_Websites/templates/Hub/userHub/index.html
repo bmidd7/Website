@@ -1,34 +1,34 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
 {% block title %}
 Main Page
 {% endblock %}
 
 {% block extra-css %}
-<link rel="stylesheet" href="{% static 'css/Hub/userHub.css' %}">
+<link rel="stylesheet" href="{% static 'css/Hub/userHub.css' %}" />
 {% endblock %}
 
 {% block app-specific-logo-in-sidebar %}
-<a>
-
+<a href="/" name="sidebar-logo-link">
+    <img src="{% static 'img/logo.png' %}" id="sidebar-logo" alt="Website Logo | Return to Home Page">
 </a>
 {% endblock %}
 
+{% block main %}
+{{ username|json_script:"user-data" }}
+<!--<main name="main-wrapper" id="main-wrapper">-->
+<div id="open-sidebar-div">
+    <button id="open-sidebar" class="open-sidebar hover-over-buttons">☰</button>
+</div>
 
-{% block main %} <!--<main name="main-wrapper" id="main-wrapper">-->
-<div>
-    <div id="open-sidebar-div">
-        <button id="open-sidebar" class="open-sidebar hover-over-buttons">
-            ☰
-        </button>
-    </div>
-        
-    <canvas id="canvas"></canvas>
-    <div id="orb"></div>
-
+<canvas id="canvas">
+</canvas>
+<div id="orb">
+    <a id="account-button"></a>
 </div>
 {% endblock %}
 
-<script src="{% static 'js/Hub/tendrils.js' %}"></script>
+{% block extra_js %}
+<script type="module" src="{% static 'js/Hub/tendrils.js' %}"></script>
+{% endblock %}

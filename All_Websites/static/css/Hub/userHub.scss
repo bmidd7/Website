@@ -1,5 +1,6 @@
 $button-height-width: 25px;
 $hover-over-color: rgba(0, 0, 0, .5);
+$text-color: rgba(235, 235, 235, .9);
 
 
 .open-sidebar {
@@ -7,6 +8,7 @@ $hover-over-color: rgba(0, 0, 0, .5);
 
     height: $button-height-width;
     width: $button-height-width;
+    z-index: 100;
 
     background-color: transparent;
     border-color: transparent;
@@ -34,33 +36,53 @@ body {
     color: #fff;
     font-family: 'Courier New', monospace;
     overflow: hidden;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 }
 
 canvas {
-    position: fixed;
+    position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
 }
 
 /* ── Central orb ── */
 #orb {
-    position: fixed;
+    position: absolute;
     width: 80px;
     height: 80px;
+    overflow: hidden;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #e0e8ff, #4a6fff 60%, #1a2a88);
+    background: radial-gradient(circle at 35% 35%, #b9c8ff, #3654c9 60%, #162469);
     box-shadow:
-        0 0 30px 8px rgba(100, 140, 255, 0.55),
-        0 0 80px 20px rgba(80, 120, 255, 0.25);
+        0 0 22px 6px rgba(72, 106, 210, 0.32),
+        0 0 56px 14px rgba(56, 88, 190, 0.14);
     transform: translate(-50%, -50%);
     cursor: default;
     z-index: 10;
+    pointer-events: none;
+}
+#account-button {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background-color: transparent;
+    cursor: pointer;
+    z-index: 11;
+    pointer-events: auto;
 }
 
 /* ── Project nodes ── */
 .node {
-    position: fixed;
+    position: absolute;
     transform: translate(-50%, -50%);
     z-index: 10;
 }
@@ -85,4 +107,13 @@ canvas {
     border-color: rgba(140, 170, 255, 0.9);
     color: #fff;
     box-shadow: 0 0 14px 2px rgba(100, 140, 255, 0.3);
+}
+
+#account-button {
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    text-decoration: none;
+    color: $text-color;
 }
