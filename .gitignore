@@ -6,3 +6,4 @@ __pycache__/
 All_Websites/static/img/Google Logos/Android/png@1x/.DS_Store
 All_Websites/All_Websites/__pycache__/settings.cpython-314.pyc
 All_Websites/db.sqlite3
+All_Websites/.vscode/tasks.json
