@@ -2,6 +2,7 @@ import {
     ANGLE_OFFSET,
     DRAG_EASE,
     DRAG_THRESHOLD,
+    HUB_CONFIG,
     LIMIT_BOUNCE_RATIO,
     MAX_DRAG_RATIO,
     type DragState,
@@ -10,6 +11,34 @@ import {
 } from "./tendrilsConfig.js";
 
 let activeDrag: DragState | null = null;
+
+function getIdleOffset(node: NodeElType, index: number, time: number) {
+    const idleMotion = HUB_CONFIG.idleMotion;
+    const seed = index * 1.61803398875 + 0.73;
+    const baseRadius = node._manual ? idleMotion.manualRadius : idleMotion.autoRadius;
+    const limitRadius = node._maxDragDistance
+        ? Math.max(
+            idleMotion.minRadius,
+            Math.min(baseRadius, node._maxDragDistance * idleMotion.maxDragRatio),
+        )
+        : baseRadius;
+    const x =
+        Math.sin(time * idleMotion.xPrimarySpeed + seed * idleMotion.seedXPrimary)
+            * limitRadius
+            * idleMotion.xPrimaryInfluence
+        + Math.cos(time * idleMotion.xSecondarySpeed + seed * idleMotion.seedXSecondary)
+            * limitRadius
+            * idleMotion.xSecondaryInfluence;
+    const y =
+        Math.cos(time * idleMotion.yPrimarySpeed + seed * idleMotion.seedYPrimary)
+            * limitRadius
+            * idleMotion.yPrimaryInfluence
+        + Math.sin(time * idleMotion.ySecondarySpeed + seed * idleMotion.seedYSecondary)
+            * limitRadius
+            * idleMotion.ySecondaryInfluence;
+
+    return { x, y };
+}
 
 export function setNodePosition(node: NodeElType, x: number, y: number) {
     node.style.left = x + "px";
@@ -109,6 +138,12 @@ export function clampToNodeDragLimit(node: NodeElType, x: number, y: number) {
 }
 
 export function createProjectNodes(projects: Project[]) {
+    const hubScene = document.getElementById("hub-scene");
+
+    if (!hubScene) {
+        throw new Error("Missing #hub-scene element for project nodes.");
+    }
+
     const nodeEls: NodeElType[] = [];
 
     projects.forEach((project) => {
@@ -214,7 +249,7 @@ export function createProjectNodes(projects: Project[]) {
         });
 
         wrapper.appendChild(button);
-        document.body.appendChild(wrapper);
+        hubScene.appendChild(wrapper);
         nodeEls.push(wrapper);
     });
 
@@ -238,12 +273,16 @@ export function positionNodes(
 
         setNodePosition(nodeEls[i], x, y);
         setNodeTarget(nodeEls[i], x, y);
+        nodeEls[i]._initialX = x;
+        nodeEls[i]._initialY = y;
         nodeEls[i]._angle = angle;
     });
 }
 
 export function updateNodeMotion(nodeEls: NodeElType[]) {
-    nodeEls.forEach((node) => {
+    const time = performance.now();
+
+    nodeEls.forEach((node, index) => {
         if (
             node._x === undefined ||
             node._y === undefined ||
@@ -253,10 +292,28 @@ export function updateNodeMotion(nodeEls: NodeElType[]) {
             return;
         }
 
-        const nextX = node._x + (node._targetX - node._x) * DRAG_EASE;
-        const nextY = node._y + (node._targetY - node._y) * DRAG_EASE;
-        const snapX = Math.abs(node._targetX - nextX) < 0.5 ? node._targetX : nextX;
-        const snapY = Math.abs(node._targetY - nextY) < 0.5 ? node._targetY : nextY;
+        let targetX = node._targetX;
+        let targetY = node._targetY;
+
+        if (!activeDrag || activeDrag.node !== node) {
+            const idleOffset = getIdleOffset(node, index, time);
+            const ambientX = targetX + idleOffset.x;
+            const ambientY = targetY + idleOffset.y;
+            const limitedPosition = clampToNodeDragLimit(node, ambientX, ambientY);
+
+            if (limitedPosition.isClamped) {
+                targetX = limitedPosition.edgeX;
+                targetY = limitedPosition.edgeY;
+            } else {
+                targetX = limitedPosition.targetX;
+                targetY = limitedPosition.targetY;
+            }
+        }
+
+        const nextX = node._x + (targetX - node._x) * DRAG_EASE;
+        const nextY = node._y + (targetY - node._y) * DRAG_EASE;
+        const snapX = Math.abs(targetX - nextX) < 0.5 ? targetX : nextX;
+        const snapY = Math.abs(targetY - nextY) < 0.5 ? targetY : nextY;
 
         if (snapX !== node._x || snapY !== node._y) {
             setNodePosition(node, snapX, snapY);

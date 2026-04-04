@@ -1,29 +1,40 @@
-$button-height-width: 25px;
-$hover-over-color: rgba(0, 0, 0, .5);
-$text-color: rgba(235, 235, 235, .9);
+@use "userHub.config" as config;
 
 
 .open-sidebar {
     display: flex;
+    align-items: center;
+    justify-content: center;
 
-    height: $button-height-width;
-    width: $button-height-width;
+    height: config.$open-sidebar-button-size;
+    width: config.$open-sidebar-button-size;
+    font-size: config.$open-sidebar-icon-size;
+    line-height: 1;
     z-index: 100;
 
     background-color: transparent;
     border-color: transparent;
-    color: white;
-
-    justify-content: center;
-    align-content: center;
+    color: config.$app-text-color;
 }
 
 .open-sidebar.moused-over {
-    background-color: $hover-over-color;
-    box-shadow: 0 0 0 2px $hover-over-color;
+    background-color: config.$open-sidebar-hover-color;
+    box-shadow: 0 0 0 2px config.$open-sidebar-hover-color;
     border-radius: 50%;
 }
 
+#open-sidebar-div {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 100;
+}
+
+
+html,
+body {
+    overflow: hidden;
+}
 
 * {
     margin: 0;
@@ -32,12 +43,30 @@ $text-color: rgba(235, 235, 235, .9);
 }
 
 body {
-    background: #09090f;
-    color: #fff;
-    font-family: 'Courier New', monospace;
-    overflow: hidden;
+    background: config.$app-background;
+    color: config.$app-text-color;
+    font-family: config.$app-font-family;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
+}
+
+#wrapper-div,
+#main-wrapper {
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+#main-wrapper {
+    padding: 0;
+}
+
+#hub-scene {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    isolation: isolate;
+    z-index: 0;
 }
 
 canvas {
@@ -52,17 +81,20 @@ canvas {
 /* ── Central orb ── */
 #orb {
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: config.$orb-size;
+    height: config.$orb-size;
     overflow: hidden;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #b9c8ff, #3654c9 60%, #162469);
-    box-shadow:
-        0 0 22px 6px rgba(72, 106, 210, 0.32),
-        0 0 56px 14px rgba(56, 88, 190, 0.14);
+    background: radial-gradient(
+        circle at 35% 35%,
+        config.$orb-gradient-highlight,
+        config.$orb-gradient-mid 60%,
+        config.$orb-gradient-shadow
+    );
+    box-shadow: config.$orb-box-shadow;
     transform: translate(-50%, -50%);
     cursor: default;
-    z-index: 10;
+    z-index: config.$orb-z-index;
     pointer-events: none;
 }
 #account-button {
@@ -76,7 +108,7 @@ canvas {
     border-radius: inherit;
     background-color: transparent;
     cursor: pointer;
-    z-index: 11;
+    z-index: config.$account-button-z-index;
     pointer-events: auto;
 }
 
@@ -84,29 +116,29 @@ canvas {
 .node {
     position: absolute;
     transform: translate(-50%, -50%);
-    z-index: 10;
+    z-index: config.$node-z-index;
 }
 
 .node button {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(140, 170, 255, 0.35);
-    color: #c8d4ff;
+    background: config.$node-button-background;
+    border: 1px solid config.$node-button-border-color;
+    color: config.$node-button-text-color;
     font-family: inherit;
-    font-size: 11px;
-    letter-spacing: 0.12em;
+    font-size: config.$node-button-font-size;
+    letter-spacing: config.$node-button-letter-spacing;
     text-transform: uppercase;
-    padding: 10px 18px;
-    border-radius: 4px;
+    padding: config.$node-button-padding;
+    border-radius: config.$node-button-border-radius;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    transition: config.$node-button-transition;
 }
 
 .node button:hover {
-    background: rgba(100, 140, 255, 0.18);
-    border-color: rgba(140, 170, 255, 0.9);
-    color: #fff;
-    box-shadow: 0 0 14px 2px rgba(100, 140, 255, 0.3);
+    background: config.$node-button-hover-background;
+    border-color: config.$node-button-hover-border-color;
+    color: config.$node-button-hover-text-color;
+    box-shadow: config.$node-button-hover-box-shadow;
 }
 
 #account-button {
@@ -115,5 +147,5 @@ canvas {
 
     text-align: center;
     text-decoration: none;
-    color: $text-color;
+    color: config.$account-button-text-color;
 }
