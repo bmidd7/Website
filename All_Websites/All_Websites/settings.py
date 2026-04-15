@@ -74,6 +74,8 @@ INSTALLED_APPS = [
     'Accounts',
     'APIs',
     'School',
+    'AI',
+    'Services',
 ]
 
 MIDDLEWARE = [

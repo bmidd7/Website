@@ -18,8 +18,10 @@ export const HUB_CONFIG = {
         { label: "School", url: "/School/" },
         { label: "Chemistry", url: "/School/Chemistry/" },
         { label: "APIs", url: "/API/" },
+        { label: "Services", url: "/Services/" },
         { label: "Engineering", url: "/School/Engineering/" },
         { label: "Art", url: "/My-Art/" },
+        { label: "AIs", url: "/AI/" },
     ],
     idleMotion: {
         manualRadius: 8,

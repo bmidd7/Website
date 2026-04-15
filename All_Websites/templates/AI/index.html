@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+AI Studio
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static 'css/AI.css' %}?v=20260407d">
+{% endblock %}
+
+{% block app-specific-logo-in-sidebar %}
+<a href="{% url 'AI_Hub' %}" id="ai-sidebar-badge" class="no-underline" aria-label="Open AI Studio">
+    AI
+</a>
+{% endblock %}
+
+{% block main %}
+<div id="open-sidebar-div">
+    <button id="open-sidebar" class="open-sidebar hover-over-buttons">&#9776;</button>
+</div>
+
+<section id="ai-shell" class="ai-shell">
+    <div id="chat-panel" class="chat-panel chat-panel--solo">
+        <div id="chat-log" class="chat-log" aria-live="polite">
+            <article class="message assistant">
+                <p class="message-label">Assistant</p>
+                <p>Ask me anything once LM Studio is running with a model loaded.</p>
+            </article>
+        </div>
+
+        <form id="chat-form" class="chat-form">
+            <label class="sr-only" for="chat-input">Message</label>
+            <textarea
+                id="chat-input"
+                name="message"
+                rows="2"
+                placeholder="Ask your local model something useful..."
+                required
+            ></textarea>
+            <div class="chat-controls">
+                <button id="clear-history" class="history-button" type="button">Clear local history</button>
+                <button id="chat-submit" type="submit">Send</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/AI/AI.js' %}?v=20260407b"></script>
+{% endblock %}
