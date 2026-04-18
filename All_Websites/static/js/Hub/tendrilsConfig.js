@@ -1,3 +1,6 @@
+export const BASE_ORB_DIAMETER = 95;
+export const TEXT_FILL_RATIO = 0.85;
+export const MAX_ORB_VIEWPORT_RATIO = 0.1;
 function getViewportBaseSize() {
     return Math.min(window.innerWidth, window.innerHeight);
 }

@@ -1,6 +1,4 @@
-const BASE_ORB_DIAMETER = 80;
-const TEXT_FILL_RATIO = 0.85;
-const MAX_ORB_VIEWPORT_RATIO = 0.1;
+import { BASE_ORB_DIAMETER, TEXT_FILL_RATIO, MAX_ORB_VIEWPORT_RATIO, } from "./tendrilsConfig.js";
 const textMeasureCanvas = document.createElement("canvas");
 const textMeasureContext = textMeasureCanvas.getContext("2d");
 function getUserName() {
@@ -102,8 +100,8 @@ function getRequiredOrbDiameter(lines, style) {
     const textBounds = Math.max(widestLine, textBlockHeight);
     return Math.ceil(textBounds / TEXT_FILL_RATIO);
 }
-function sizeOrbToLabel(orbEl, accountButton, label) {
-    const buttonStyle = window.getComputedStyle(accountButton);
+function sizeOrbToLabel(orbEl, labelEl, label) {
+    const buttonStyle = window.getComputedStyle(labelEl);
     const maxViewportDiameter = Math.min(window.innerWidth, window.innerHeight) * MAX_ORB_VIEWPORT_RATIO;
     let bestLines = [label];
     let bestDiameter = getRequiredOrbDiameter(bestLines, buttonStyle);
@@ -124,10 +122,40 @@ function sizeOrbToLabel(orbEl, accountButton, label) {
             }
         }
     }
-    accountButton.textContent = bestLines.join("\n");
-    accountButton.style.whiteSpace = bestLines.length > 1 ? "pre-line" : "normal";
+    labelEl.textContent = bestLines.join("\n");
+    labelEl.style.whiteSpace = bestLines.length > 1 ? "pre-line" : "normal";
     orbEl.style.width = `${Math.max(BASE_ORB_DIAMETER, bestDiameter)}px`;
     orbEl.style.height = `${Math.max(BASE_ORB_DIAMETER, bestDiameter)}px`;
+}
+function sizeOrbToLines(orbEl, labelEl, lines) {
+    const style = window.getComputedStyle(labelEl);
+    const diameter = getRequiredOrbDiameter(lines, style);
+    orbEl.style.width = `${Math.max(BASE_ORB_DIAMETER, diameter)}px`;
+    orbEl.style.height = `${Math.max(BASE_ORB_DIAMETER, diameter)}px`;
+}
+function buildPrimaryOrbLink(label, href, ariaLabel) {
+    const linkEl = document.createElement("a");
+    linkEl.className = "orb-primary-link";
+    linkEl.href = href;
+    linkEl.setAttribute("aria-label", ariaLabel);
+    linkEl.textContent = label;
+    return linkEl;
+}
+function buildGuestAuthLinks() {
+    const linksWrapper = document.createElement("div");
+    linksWrapper.className = "orb-auth-links";
+    const loginLink = document.createElement("a");
+    loginLink.className = "orb-auth-link";
+    loginLink.href = "/accounts/login/?next=/";
+    loginLink.textContent = "Log In";
+    loginLink.setAttribute("aria-label", "Log in");
+    const signupLink = document.createElement("a");
+    signupLink.className = "orb-auth-link";
+    signupLink.href = "/accounts/signup/";
+    signupLink.textContent = "Sign Up";
+    signupLink.setAttribute("aria-label", "Sign up");
+    linksWrapper.append(loginLink, signupLink);
+    return { linksWrapper, loginLink };
 }
 document.addEventListener("DOMContentLoaded", () => {
     const orbEl = document.getElementById("orb");
@@ -138,24 +166,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!accountButton) {
         throw new Error("Missing #account-button element for center orb link.");
     }
-    accountButton.style.lineHeight = "1.15";
-    accountButton.style.overflowWrap = "anywhere";
     const userName = getUserName();
     if (userName) {
         const displayName = userName.trim().replace(/\s+/g, " ");
-        console.log("Logged in as:", displayName);
-        accountButton.setAttribute("aria-label", `Open account settings for ${displayName}`);
-        accountButton.href = "/accounts/settings/";
-        sizeOrbToLabel(orbEl, accountButton, displayName);
+        const accountLink = buildPrimaryOrbLink("", "/accounts/settings/", `Open account settings for ${displayName}`);
+        accountLink.style.lineHeight = "1.15";
+        accountLink.style.overflowWrap = "anywhere";
+        accountButton.replaceChildren(accountLink);
+        sizeOrbToLabel(orbEl, accountLink, displayName);
         window.addEventListener("resize", () => {
-            sizeOrbToLabel(orbEl, accountButton, displayName);
+            sizeOrbToLabel(orbEl, accountLink, displayName);
         });
     }
     else {
-        console.log("No user logged in.");
-        accountButton.textContent = "Log In";
-        accountButton.setAttribute("aria-label", "Log in");
-        accountButton.href = "/accounts/login/?next=/";
+        const { linksWrapper, loginLink } = buildGuestAuthLinks();
+        accountButton.replaceChildren(linksWrapper);
+        sizeOrbToLines(orbEl, loginLink, ["Log In", "Sign Up"]);
+        window.addEventListener("resize", () => {
+            sizeOrbToLines(orbEl, loginLink, ["Log In", "Sign Up"]);
+        });
     }
 });
 //# sourceMappingURL=centerOrb.js.map

@@ -1,3 +1,9 @@
+export const BASE_ORB_DIAMETER = 95;
+export const TEXT_FILL_RATIO = 0.85;
+export const MAX_ORB_VIEWPORT_RATIO = 0.1;
+
+
+
 export type NodeElType = HTMLDivElement & {
   _angle?: number;
   _x?: number;
