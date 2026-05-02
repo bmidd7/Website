@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Away PC
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static 'css/Services/PC.css' %}?v=20260429a">
+{% endblock %}
+
+{% block app-specific-logo-in-sidebar %}
+<a href="{% url 'Services_PC' %}" id="pc-sidebar-badge" class="no-underline" aria-label="Open Away PC">
+    PC
+</a>
+{% endblock %}
+
+{% block main %}
+<div id="open-sidebar-div">
+    <button id="open-sidebar" class="open-sidebar hover-over-buttons" aria-label="Open sidebar">&#9776;</button>
+</div>
+
+<section
+    id="pc-access-app"
+    class="pc-shell"
+    data-auth-url="{% url 'Services_PC_auth' %}"
+    data-forget-url="{% url 'Services_PC_forget' %}"
+    data-bridge-status-url="{% url 'Services_PC_bridge_status' %}"
+    data-layer-1-remembered="{{ pc_layer_1_remembered|yesno:'true,false' }}"
+    data-layer-2-remembered="{{ pc_layer_2_remembered|yesno:'true,false' }}"
+    data-remote-name="{{ pc_remote_name }}"
+    data-desktop-configured="{{ pc_desktop_configured|yesno:'true,false' }}"
+>
+    <div class="pc-hero">
+        <div class="pc-hero-copy">
+            <p class="pc-kicker">Private remote workspace</p>
+            <h1>{{ pc_remote_name }}</h1>
+            <p class="pc-subtitle">Three access layers before the desktop appears.</p>
+        </div>
+
+        <div class="pc-device" aria-hidden="true">
+            <div class="pc-device-screen">
+                <span class="pc-device-dot pc-device-dot--green"></span>
+                <span class="pc-device-dot pc-device-dot--amber"></span>
+                <span class="pc-device-dot pc-device-dot--red"></span>
+                <div class="pc-device-window">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="pc-device-stand"></div>
+        </div>
+    </div>
+
+    <div class="pc-layout">
+        <aside class="pc-status-panel" aria-label="Access status">
+            <ol class="pc-steps">
+                <li class="pc-step" data-step-status="locked" data-layer-step="1">
+                    <span class="pc-step-marker">1</span>
+                    <span>
+                        <strong>Outer gate</strong>
+                        <small data-layer-status="1">Locked</small>
+                    </span>
+                </li>
+                <li class="pc-step" data-step-status="locked" data-layer-step="2">
+                    <span class="pc-step-marker">2</span>
+                    <span>
+                        <strong>Device gate</strong>
+                        <small data-layer-status="2">Locked</small>
+                    </span>
+                </li>
+                <li class="pc-step" data-step-status="locked" data-layer-step="3">
+                    <span class="pc-step-marker">3</span>
+                    <span>
+                        <strong>Session gate</strong>
+                        <small data-layer-status="3">Required every time</small>
+                    </span>
+                </li>
+            </ol>
+
+            <button id="pc-forget-button" class="pc-secondary-button" type="button">
+                Forget remembered gates
+            </button>
+        </aside>
+
+        <section class="pc-access-panel" aria-label="PC access">
+            <form id="pc-auth-form" class="pc-auth-form" autocomplete="off">
+                <div class="pc-form-heading">
+                    <p id="pc-current-layer-label" class="pc-kicker">Layer 1</p>
+                    <h2 id="pc-form-title">Outer gate</h2>
+                </div>
+
+                <label class="pc-password-label" for="pc-password-input">
+                    Password
+                </label>
+                <div class="pc-password-row">
+                    <input
+                        id="pc-password-input"
+                        name="password"
+                        type="password"
+                        autocomplete="off"
+                        required
+                    >
+                    <button id="pc-toggle-password" class="pc-icon-button" type="button" aria-label="Show password">
+                        Show
+                    </button>
+                </div>
+
+                <p id="pc-auth-message" class="pc-auth-message" role="status" aria-live="polite"></p>
+
+                <button id="pc-submit-button" class="pc-primary-button" type="submit">
+                    Unlock
+                </button>
+            </form>
+
+            <div id="pc-remote-panel" class="pc-remote-panel" hidden>
+                <div class="pc-remote-header">
+                    <div>
+                        <p class="pc-kicker">Connected</p>
+                        <h2 id="pc-remote-title">{{ pc_remote_name }}</h2>
+                    </div>
+                    <a id="pc-open-remote" class="pc-primary-link" href="#" target="_blank" rel="noreferrer noopener">
+                        Open
+                    </a>
+                </div>
+                <iframe id="pc-remote-frame" title="{{ pc_remote_name }} remote desktop"></iframe>
+                <p id="pc-remote-message" class="pc-remote-message"></p>
+
+                <div id="pc-setup-panel" class="pc-setup-panel" hidden>
+                    <p class="pc-kicker">Desktop bridge needed</p>
+                    <h3>No browser desktop is configured yet.</h3>
+                    <p>
+                        Point this portal at a web remote desktop bridge, then the unlocked session will open here.
+                    </p>
+                    <dl>
+                        <div>
+                            <dt>Desktop URL</dt>
+                            <dd>PC_DESKTOP_URL</dd>
+                        </div>
+                        <div>
+                            <dt>Status host</dt>
+                            <dd>PC_BRIDGE_STATUS_HOST</dd>
+                        </div>
+                        <div>
+                            <dt>Status port</dt>
+                            <dd>PC_BRIDGE_STATUS_PORT</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/Services/PC.js' %}?v=20260429a"></script>
+{% endblock %}
