@@ -29,7 +29,16 @@ class PubSubJSON(TypedDict):
     subscription: str
 
 
-def processMessage(message, service):
+def processMessage(message, service, SETTINGS: GmailSettings):
+    if SETTINGS.organize_inbox:
+        labels_to_add = labels_to_remove = []
+        
+        label_choices: dict[str, list[str]] = {
+            "add" : labels_to_add,
+            "remove" : labels_to_remove
+        }
+
+        emailmanagement.updateLabels(service=service, message=message, labels=label_choices)
 
 
 
@@ -183,7 +192,7 @@ def PubSubMessage(raw_message):
 
     
     for message in messages:
-        processMessage(message, service)
+        processMessage(message, service, GMAIL_SETTINGS)
 
     GMAIL_SETTINGS.last_history_ID = new_history_id
     GMAIL_SETTINGS.save(update_fields=["last_history_ID"])

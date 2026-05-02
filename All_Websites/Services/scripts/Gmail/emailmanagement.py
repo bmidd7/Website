@@ -115,13 +115,13 @@ def getBasicData(message):
     }
 
 
-def addToLabel(service, message, labels: list[str], add:bool = True):
+def updateLabels(service, message, labels: dict[str, list[str]]):
     data = getBasicData(message)
 
 
     label_changes: dict[str, list[str]] = {
-        'addLabelIds': labels if add else [], 
-        'removeLabelIds': [] if add else labels 
+        'addLabelIds': labels["add"], 
+        'removeLabelIds': labels["remove"]
     }
 
     service.users().messages().modify(

@@ -15,6 +15,10 @@ class GmailSettings(models.Model):
     token_JSON = models.TextField(blank=True, null=True)
     last_use = models.DateTimeField(blank=True, null=True)
 
+
+    organize_inbox = models.BooleanField(default=False)
+
+
     use_advanced_settings = models.BinaryField()
 
     track_emails = models.BinaryField()
