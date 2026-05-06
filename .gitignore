@@ -1,5 +1,5 @@
 All_Websites/.env
-.env
+*.env
 __pycache__/
 *.pyc
 *.DS_Store
@@ -7,3 +7,8 @@ All_Websites/All_Websites/__pycache__/settings.cpython-314.pyc
 All_Websites/db.sqlite3
 All_Websites/.vscode/tasks.json
 All_Websites/client_secret_486531600799-am8rjon972k36bo9h3jii8bqjrq1h8g2.apps.googleusercontent.com.json
+All_Websites/Services/guacamole-stack/
+
+# Added by ggshield
+.cache_ggshield
+All_Websites/Accounts/services.py

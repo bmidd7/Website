@@ -35,4 +35,3 @@ class Sorting(models.Model):
         ('subject', 'Subject'),
         ('body', 'Content'),
     ]
-

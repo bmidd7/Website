@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Fly!
+{% endblock %}
+
+{% block extra-css %}
+<link rel="stylesheet" href="{% static 'css/Fly/main.css' %}" />
+{% endblock %}
+
+{% block main %}
+<canvas id="canvasDiv">
+
+</canvas>
+<div id="options-wrapper-div">
+    <div id="options" class="grid-container">
+
+        <div class="item">
+            <label for="Length (Sec)">Length (Sec)</label>
+            <input type="number">
+        </div>
+        <div class="item">
+            <label for="FPS">FPS</label>
+            <input type="number">
+        </div>
+        <div class="item">
+            <label for="Quality">Quality</label>
+            <select id="Quality-Select">
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+            </select>
+        </div>
+        <div class="item">
+            <label for="World">World</label>
+            <select id="World-Select">
+                <option>Default</option>
+                <option disabled>1</option>
+                <option disabled>2</option>
+                <option disabled>3</option>
+            </select>
+        </div>
+        <div class="item">
+            <label for="Behavior">Behavior</label>
+            <select id="Behavior-Select">
+                <option>Default</option>
+                <option disabled>Dead</option>
+                <option disabled>2</option>
+                <option disabled>3</option>
+            </select>
+        </div>
+        <div class="Seed">
+            <label for="Seed">Seed</label>
+            <input type="number">
+        </div>
+        <div class="item">
+            <label for="World Size">World Size</label>
+            <select id="World-Size">
+                <option>Default</option>
+                <option disabled>1</option>
+                <option disabled>2</option>
+                <option disabled>3</option>
+            </select>
+        </div>
+
+    </div>
+    <div id="submit-button-div">
+        <input id="submit-params" type="submit" value="Submit">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

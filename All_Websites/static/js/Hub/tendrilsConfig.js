@@ -25,6 +25,7 @@ export const HUB_CONFIG = {
         { label: "Engineering", url: "/School/Engineering/" },
         { label: "Art", url: "/My-Art/" },
         { label: "AIs", url: "/AI/" },
+        { label: "Fly", url: "/Fly/" },
     ],
     idleMotion: {
         manualRadius: 8,

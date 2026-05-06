@@ -61,3 +61,11 @@ class UserPreferences(models.Model):
         self.theme_text_color = theme['text_color']
         self.theme_accent_color = theme['accent_color']
         super().save(*args, **kwargs)
+
+class MFA(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    tempOTP_secret = models.CharField(max_length=32, blank=True, null=True)
+    is_tempOTP_enabled = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.user.username
