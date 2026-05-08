@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Account Security</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>Account Security</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <section>
+            <h2>Google Authenticator and Passkeys</h2>
+            <p>
+                <a href="{% url 'mfa_index' %}">Manage Google Authenticator style codes, passkeys, and recovery codes</a>
+            </p>
+            <p>
+                The built-in TOTP setup works with Google Authenticator and similar free apps.
+            </p>
+        </section>
+
+        <section>
+            <h2>Your PC</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ computer_form.as_p }}
+                <p>Leave password fields blank to keep the current gate passwords.</p>
+                <button type="submit" name="action" value="save_computer">Save PC Settings</button>
+            </form>
+            {% if guac_status %}
+                <p>{{ guac_status.message }}</p>
+            {% endif %}
+            <p>
+                <a href="{% url 'Services_PC' %}">Open your PC page</a>
+            </p>
+        </section>
+    </body>
+</html>

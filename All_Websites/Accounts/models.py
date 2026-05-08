@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password, is_password_usable, make_password
+from django.core.exceptions import ValidationError
+
+from .crypto import can_decrypt_secret, decrypt_secret, encrypt_secret
 
 # Create your models here.
 class UserProfile(models.Model):
@@ -69,3 +73,64 @@ class MFA(models.Model):
     
     def __str__(self):
         return self.user.username
+
+
+class UserComputer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="computer")
+    display_name = models.CharField(max_length=80, default="My PC")
+    desktop_url = models.URLField(blank=True)
+    bridge_status_host = models.CharField(max_length=255, blank=True)
+    bridge_status_port = models.PositiveIntegerField(null=True, blank=True)
+    is_enabled = models.BooleanField(default=False)
+    guac_username = models.CharField(max_length=150, blank=True)
+    guac_uses_account_password = models.BooleanField(default=True)
+    guac_password_encrypted = models.TextField(blank=True)
+    access_password_1_hash = models.CharField(max_length=128, blank=True)
+    access_password_2_hash = models.CharField(max_length=128, blank=True)
+    access_password_3_hash = models.CharField(max_length=128, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    PASSWORD_HASH_FIELDS = {
+        1: "access_password_1_hash",
+        2: "access_password_2_hash",
+        3: "access_password_3_hash",
+    }
+
+    def clean(self):
+        if self.bridge_status_port is not None and not 1 <= self.bridge_status_port <= 65535:
+            raise ValidationError({"bridge_status_port": "Port must be between 1 and 65535."})
+
+    def set_access_password(self, layer: int, raw_password: str) -> None:
+        field_name = self.PASSWORD_HASH_FIELDS[layer]
+        setattr(self, field_name, make_password(raw_password) if raw_password else "")
+
+    def has_access_password(self, layer: int) -> bool:
+        encoded = getattr(self, self.PASSWORD_HASH_FIELDS[layer])
+        return bool(encoded and is_password_usable(encoded))
+
+    def check_access_password(self, layer: int, raw_password: str) -> bool:
+        encoded = getattr(self, self.PASSWORD_HASH_FIELDS[layer])
+        if not encoded:
+            return False
+        return check_password(raw_password, encoded)
+
+    def bridge_configured(self) -> bool:
+        return bool(self.bridge_status_host and self.bridge_status_port)
+
+    def resolved_guac_username(self) -> str:
+        return self.guac_username or self.user.username
+
+    def set_guac_password(self, raw_password: str) -> None:
+        self.guac_password_encrypted = encrypt_secret(raw_password) if raw_password else ""
+
+    def has_guac_password(self) -> bool:
+        return bool(self.guac_password_encrypted and can_decrypt_secret(self.guac_password_encrypted))
+
+    def get_guac_password(self) -> str:
+        if not self.guac_password_encrypted:
+            return ""
+        return decrypt_secret(self.guac_password_encrypted)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.display_name}"

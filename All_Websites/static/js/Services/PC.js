@@ -157,7 +157,7 @@ async function submitCurrentLayer() {
         }
         if (data.accessGranted) {
             accessGranted = true;
-            showRemote(data.desktopUrl || data.remoteUrl || "", data.bridgeStatus);
+            showRemote(data.desktopUrl || data.remoteUrl || "", data.bridgeStatus, data.guacamoleStatus);
             updateSteps();
             return;
         }
@@ -180,7 +180,7 @@ function bridgeStatusText(bridgeStatus) {
     }
     return bridgeStatus.message || "Desktop bridge is not online yet.";
 }
-function showRemote(remoteUrl, bridgeStatus) {
+function showRemote(remoteUrl, bridgeStatus, guacamoleStatus) {
     requiredAuthForm.hidden = true;
     requiredRemotePanel.hidden = false;
     requiredSetupPanel.hidden = true;
@@ -195,6 +195,10 @@ function showRemote(remoteUrl, bridgeStatus) {
     }
     requiredRemoteLink.href = remoteUrl;
     requiredRemoteFrame.src = remoteUrl;
+    if (guacamoleStatus?.configured && !guacamoleStatus.valid) {
+        setRemoteMessage(guacamoleStatus.message || "Saved Guacamole credentials were rejected.", "error");
+        return;
+    }
     setRemoteMessage(bridgeStatusText(bridgeStatus), bridgeStatus?.online ? "success" : "error");
 }
 async function refreshBridgeStatus() {

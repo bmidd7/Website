@@ -3,12 +3,14 @@ import os
 import socket
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.core import signing
 from django.core.signing import BadSignature, SignatureExpired
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.utils.crypto import constant_time_compare
 from django.views.decorators.csrf import csrf_exempt
+from Accounts.models import UserComputer
+from Accounts.services import verify_guac_login
 # from .scripts.Gmail import
 
 PC_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30
@@ -30,16 +32,58 @@ def _pc_expected_cookie_value(layer: int) -> str:
 
 
 def _pc_password_for_layer(layer: int) -> str:
-    return os.environ.get(f"PC_ACCESS_PASSWORD_{layer}", "")
+    return ""
 
 
 def _pc_desktop_url() -> str:
     return os.environ.get(PC_DESKTOP_URL_ENV) or os.environ.get(PC_REMOTE_URL_ENV, "")
 
 
-def _pc_bridge_status() -> dict[str, object]:
-    host = os.environ.get(PC_BRIDGE_HOST_ENV, "").strip()
-    raw_port = os.environ.get(PC_BRIDGE_PORT_ENV, "").strip()
+def _pc_for_request(request) -> UserComputer | None:
+    user = getattr(request, "user", None)
+    if not user or not user.is_authenticated:
+        return None
+
+    computer = getattr(user, "computer", None)
+    if computer and computer.is_enabled:
+        return computer
+    return None
+
+
+def _pc_desktop_url_for_request(request) -> str:
+    computer = _pc_for_request(request)
+    if computer and computer.desktop_url:
+        return computer.desktop_url
+    return _pc_desktop_url()
+
+
+def _pc_remote_name_for_request(request) -> str:
+    computer = _pc_for_request(request)
+    if computer:
+        return computer.display_name
+    return os.environ.get("PC_REMOTE_NAME", "Home PC")
+
+
+def _pc_password_matches(request, layer: int, provided_password: str) -> bool:
+    computer = _pc_for_request(request)
+    return bool(computer and computer.has_access_password(layer) and computer.check_access_password(layer, provided_password))
+
+
+def _pc_password_configured(request, layer: int) -> bool:
+    computer = _pc_for_request(request)
+    return bool(computer and computer.has_access_password(layer))
+
+
+def _pc_bridge_status(request) -> dict[str, object]:
+    computer = _pc_for_request(request)
+    if computer:
+        host = computer.bridge_status_host.strip()
+        raw_port = str(computer.bridge_status_port or "")
+        port_label = "Configured PC status port"
+    else:
+        host = os.environ.get(PC_BRIDGE_HOST_ENV, "").strip()
+        raw_port = os.environ.get(PC_BRIDGE_PORT_ENV, "").strip()
+        port_label = PC_BRIDGE_PORT_ENV
 
     if not host or not raw_port:
         return {
@@ -54,7 +98,7 @@ def _pc_bridge_status() -> dict[str, object]:
         return {
             "configured": True,
             "online": False,
-            "message": f"{PC_BRIDGE_PORT_ENV} must be a number.",
+            "message": f"{port_label} must be a number.",
         }
 
     try:
@@ -74,6 +118,13 @@ def _pc_bridge_status() -> dict[str, object]:
             "port": port,
             "message": "Desktop bridge is not reachable from Django.",
         }
+
+
+def _pc_guacamole_status(request) -> dict[str, object] | None:
+    computer = _pc_for_request(request)
+    if not computer:
+        return None
+    return verify_guac_login(computer)
 
 
 def _pc_signer() -> signing.TimestampSigner:
@@ -126,19 +177,22 @@ def _pc_set_layer_cookie(response: JsonResponse, layer: int) -> None:
 def Dashboard(request):
     return render(request, 'Services/Dashboard.html')
 
+@login_required
 def PC(request):
+    desktop_url = _pc_desktop_url_for_request(request)
     return render(
         request,
         'Services/PC.html',
         {
             "pc_layer_1_remembered": _pc_layer_is_remembered(request, 1),
             "pc_layer_2_remembered": _pc_layer_is_remembered(request, 2),
-            "pc_remote_name": os.environ.get("PC_REMOTE_NAME", "Home PC"),
-            "pc_desktop_configured": bool(_pc_desktop_url()),
+            "pc_remote_name": _pc_remote_name_for_request(request),
+            "pc_desktop_configured": bool(desktop_url),
         },
     )
 
 @csrf_exempt
+@login_required
 def pcAuth(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST only"}, status=405)
@@ -159,16 +213,15 @@ def pcAuth(request):
     if not _pc_layer_prerequisites_met(request, layer):
         return JsonResponse({"error": "Complete the earlier access layer first."}, status=403)
 
-    expected_password = _pc_password_for_layer(layer)
     provided_password = str(body.get("password", ""))
 
-    if not expected_password:
+    if not _pc_password_configured(request, layer):
         return JsonResponse(
-            {"error": f"PC_ACCESS_PASSWORD_{layer} is not configured."},
+            {"error": f"Layer {layer} password is not configured in your account settings."},
             status=503,
         )
 
-    if not constant_time_compare(provided_password, expected_password):
+    if not _pc_password_matches(request, layer, provided_password):
         return JsonResponse({"error": "That password did not match."}, status=403)
 
     response_data = {
@@ -179,10 +232,11 @@ def pcAuth(request):
     }
 
     if layer == 3:
-        desktop_url = _pc_desktop_url()
+        desktop_url = _pc_desktop_url_for_request(request)
         response_data["remoteUrl"] = desktop_url
         response_data["desktopUrl"] = desktop_url
-        response_data["bridgeStatus"] = _pc_bridge_status()
+        response_data["bridgeStatus"] = _pc_bridge_status(request)
+        response_data["guacamoleStatus"] = _pc_guacamole_status(request)
         response_data["desktopConfigured"] = bool(desktop_url)
 
     response = JsonResponse(response_data)
@@ -194,6 +248,7 @@ def pcAuth(request):
     return response
 
 @csrf_exempt
+@login_required
 def pcForget(request):
     if request.method != "POST":
         return JsonResponse({"error": "POST only"}, status=405)
@@ -204,11 +259,12 @@ def pcForget(request):
     response["Cache-Control"] = "no-store"
     return response
 
+@login_required
 def pcBridgeStatus(request):
     if request.method != "GET":
         return JsonResponse({"error": "GET only"}, status=405)
 
-    return JsonResponse(_pc_bridge_status())
+    return JsonResponse(_pc_bridge_status(request))
 
 def Settings(request):
     return render(request, '.html')

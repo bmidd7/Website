@@ -57,12 +57,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "django.contrib.sites",
+    'django.contrib.humanize',
     #API Stuff
     'rest_framework',
     'corsheaders',
     #sign in providors
     "allauth",
     "allauth.account",
+    "allauth.mfa",
     "allauth.socialaccount",
     #google
     "allauth.socialaccount.providers.google",
@@ -88,7 +90,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #sign in providors
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 SOCIALACCOUNT_ADAPTER = "Accounts.adapter.MySocialAccountAdapter"
@@ -171,6 +173,17 @@ ACCOUNT_EMAIL_VERIFICATION = 'optional'
 SOCIALACCOUNT_AUTO_SIGNUP = True
 ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
+
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+MFA_SUPPORTED_TYPES = ["recovery_codes", "totp", "webauthn"]
+MFA_PASSKEY_LOGIN_ENABLED = True
+MFA_PASSKEY_SIGNUP_ENABLED = False
+MFA_TRUST_ENABLED = True
+MFA_TOTP_ISSUER = "All Websites"
+MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = DEBUG
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

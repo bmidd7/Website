@@ -9,6 +9,7 @@ interface PcAuthResponse {
   desktopUrl?: string;
   desktopConfigured?: boolean;
   bridgeStatus?: PcBridgeStatus;
+  guacamoleStatus?: PcGuacamoleStatus;
   error?: string;
 }
 
@@ -17,6 +18,12 @@ interface PcBridgeStatus {
   online?: boolean;
   host?: string;
   port?: number;
+  message?: string;
+}
+
+interface PcGuacamoleStatus {
+  configured?: boolean;
+  valid?: boolean;
   message?: string;
 }
 
@@ -208,7 +215,7 @@ async function submitCurrentLayer() {
 
     if (data.accessGranted) {
       accessGranted = true;
-      showRemote(data.desktopUrl || data.remoteUrl || "", data.bridgeStatus);
+      showRemote(data.desktopUrl || data.remoteUrl || "", data.bridgeStatus, data.guacamoleStatus);
       updateSteps();
       return;
     }
@@ -233,7 +240,11 @@ function bridgeStatusText(bridgeStatus?: PcBridgeStatus) {
   return bridgeStatus.message || "Desktop bridge is not online yet.";
 }
 
-function showRemote(remoteUrl: string, bridgeStatus?: PcBridgeStatus) {
+function showRemote(
+  remoteUrl: string,
+  bridgeStatus?: PcBridgeStatus,
+  guacamoleStatus?: PcGuacamoleStatus,
+) {
   requiredAuthForm.hidden = true;
   requiredRemotePanel.hidden = false;
   requiredSetupPanel.hidden = true;
@@ -250,6 +261,11 @@ function showRemote(remoteUrl: string, bridgeStatus?: PcBridgeStatus) {
 
   requiredRemoteLink.href = remoteUrl;
   requiredRemoteFrame.src = remoteUrl;
+  if (guacamoleStatus?.configured && !guacamoleStatus.valid) {
+    setRemoteMessage(guacamoleStatus.message || "Saved Guacamole credentials were rejected.", "error");
+    return;
+  }
+
   setRemoteMessage(bridgeStatusText(bridgeStatus), bridgeStatus?.online ? "success" : "error");
 }
 
