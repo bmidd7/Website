@@ -29,7 +29,6 @@
             <form method="post">
                 {% csrf_token %}
                 {{ computer_form.as_p }}
-                <p>Leave password fields blank to keep the current gate passwords.</p>
                 <button type="submit" name="action" value="save_computer">Save PC Settings</button>
             </form>
             {% if guac_status %}

@@ -23,19 +23,21 @@ Away PC
 <section
     id="pc-access-app"
     class="pc-shell"
-    data-auth-url="{% url 'Services_PC_auth' %}"
-    data-forget-url="{% url 'Services_PC_forget' %}"
     data-bridge-status-url="{% url 'Services_PC_bridge_status' %}"
-    data-layer-1-remembered="{{ pc_layer_1_remembered|yesno:'true,false' }}"
-    data-layer-2-remembered="{{ pc_layer_2_remembered|yesno:'true,false' }}"
-    data-remote-name="{{ pc_remote_name }}"
-    data-desktop-configured="{{ pc_desktop_configured|yesno:'true,false' }}"
+    data-desktop-url="{{ pc_desktop_url }}"
+    data-mfa-required="{{ pc_mfa_required|yesno:'true,false' }}"
+    data-bridge-configured="{{ pc_bridge_status.configured|yesno:'true,false' }}"
+    data-bridge-online="{{ pc_bridge_status.online|yesno:'true,false' }}"
+    data-bridge-message="{{ pc_bridge_status.message }}"
+    data-guac-configured="{% if pc_guacamole_status and pc_guacamole_status.configured %}true{% else %}false{% endif %}"
+    data-guac-valid="{% if pc_guacamole_status and pc_guacamole_status.valid %}true{% else %}false{% endif %}"
+    data-guac-message="{% if pc_guacamole_status %}{{ pc_guacamole_status.message }}{% endif %}"
 >
     <div class="pc-hero">
         <div class="pc-hero-copy">
             <p class="pc-kicker">Private remote workspace</p>
             <h1>{{ pc_remote_name }}</h1>
-            <p class="pc-subtitle">Three access layers before the desktop appears.</p>
+            <p class="pc-subtitle">Remote access is unlocked by a recent MFA check.</p>
         </div>
 
         <div class="pc-device" aria-hidden="true">
@@ -56,104 +58,83 @@ Away PC
     <div class="pc-layout">
         <aside class="pc-status-panel" aria-label="Access status">
             <ol class="pc-steps">
-                <li class="pc-step" data-step-status="locked" data-layer-step="1">
+                <li class="pc-step" data-step-status="{% if pc_mfa_required %}active{% else %}complete{% endif %}">
                     <span class="pc-step-marker">1</span>
                     <span>
-                        <strong>Outer gate</strong>
-                        <small data-layer-status="1">Locked</small>
+                        <strong>MFA check</strong>
+                        <small>
+                            {% if pc_mfa_required %}
+                                Required every {{ pc_mfa_max_age_minutes }} minutes
+                            {% else %}
+                                Verified
+                            {% endif %}
+                        </small>
                     </span>
                 </li>
-                <li class="pc-step" data-step-status="locked" data-layer-step="2">
+                <li class="pc-step" data-step-status="{% if pc_mfa_required %}locked{% else %}complete{% endif %}">
                     <span class="pc-step-marker">2</span>
                     <span>
-                        <strong>Device gate</strong>
-                        <small data-layer-status="2">Locked</small>
-                    </span>
-                </li>
-                <li class="pc-step" data-step-status="locked" data-layer-step="3">
-                    <span class="pc-step-marker">3</span>
-                    <span>
-                        <strong>Session gate</strong>
-                        <small data-layer-status="3">Required every time</small>
+                        <strong>Remote desktop</strong>
+                        <small>
+                            {% if pc_mfa_required %}
+                                Waiting for MFA
+                            {% elif pc_desktop_configured %}
+                                Ready
+                            {% else %}
+                                Setup needed
+                            {% endif %}
+                        </small>
                     </span>
                 </li>
             </ol>
-
-            <button id="pc-forget-button" class="pc-secondary-button" type="button">
-                Forget remembered gates
-            </button>
         </aside>
 
         <section class="pc-access-panel" aria-label="PC access">
-            <form id="pc-auth-form" class="pc-auth-form" autocomplete="off">
-                <div class="pc-form-heading">
-                    <p id="pc-current-layer-label" class="pc-kicker">Layer 1</p>
-                    <h2 id="pc-form-title">Outer gate</h2>
-                </div>
-
-                <label class="pc-password-label" for="pc-password-input">
-                    Password
-                </label>
-                <div class="pc-password-row">
-                    <input
-                        id="pc-password-input"
-                        name="password"
-                        type="password"
-                        autocomplete="off"
-                        required
-                    >
-                    <button id="pc-toggle-password" class="pc-icon-button" type="button" aria-label="Show password">
-                        Show
-                    </button>
-                </div>
-
-                <p id="pc-auth-message" class="pc-auth-message" role="status" aria-live="polite"></p>
-
-                <button id="pc-submit-button" class="pc-primary-button" type="submit">
-                    Unlock
-                </button>
-            </form>
-
-            <div id="pc-remote-panel" class="pc-remote-panel" hidden>
-                <div class="pc-remote-header">
-                    <div>
-                        <p class="pc-kicker">Connected</p>
-                        <h2 id="pc-remote-title">{{ pc_remote_name }}</h2>
+            {% if pc_mfa_required %}
+                <div class="pc-auth-form">
+                    <div class="pc-form-heading">
+                        <p class="pc-kicker">MFA required</p>
+                        <h2>Verify again to open your PC</h2>
                     </div>
-                    <a id="pc-open-remote" class="pc-primary-link" href="#" target="_blank" rel="noreferrer noopener">
-                        Open
-                    </a>
-                </div>
-                <iframe id="pc-remote-frame" title="{{ pc_remote_name }} remote desktop"></iframe>
-                <p id="pc-remote-message" class="pc-remote-message"></p>
-
-                <div id="pc-setup-panel" class="pc-setup-panel" hidden>
-                    <p class="pc-kicker">Desktop bridge needed</p>
-                    <h3>No browser desktop is configured yet.</h3>
-                    <p>
-                        Set the desktop URL and optional Guacamole details in your account security settings, then the unlocked session will open here.
+                    <p class="pc-auth-message">
+                        This access expires after {{ pc_mfa_max_age_minutes }} minutes. Reauthenticate with your MFA method to continue.
                     </p>
-                    <dl>
-                        <div>
-                            <dt>Desktop URL</dt>
-                            <dd>Account Security -> Your PC -> Desktop URL</dd>
-                        </div>
-                        <div>
-                            <dt>Status host</dt>
-                            <dd>Account Security -> Your PC -> Status host</dd>
-                        </div>
-                        <div>
-                            <dt>Status port</dt>
-                            <dd>Account Security -> Your PC -> Status port</dd>
-                        </div>
-                    </dl>
+                    <a class="pc-primary-link" href="{{ pc_mfa_url }}">Verify with MFA</a>
                 </div>
-            </div>
+            {% else %}
+                <div id="pc-remote-panel" class="pc-remote-panel">
+                    <div class="pc-remote-header">
+                        <div>
+                            <p class="pc-kicker">Connected</p>
+                            <h2 id="pc-remote-title">{{ pc_remote_name }}</h2>
+                        </div>
+                        <a id="pc-open-remote" class="pc-primary-link" href="{{ pc_desktop_url|default:'#' }}" target="_blank" rel="noreferrer noopener">
+                            Open
+                        </a>
+                    </div>
+                    <iframe id="pc-remote-frame" title="{{ pc_remote_name }} remote desktop"></iframe>
+                    <p id="pc-remote-message" class="pc-remote-message">
+                        {% if pc_guacamole_status %}
+                            {{ pc_guacamole_status.message }}
+                        {% elif pc_bridge_status %}
+                            {{ pc_bridge_status.message }}
+                        {% endif %}
+                    </p>
+
+                    <div id="pc-setup-panel" class="pc-setup-panel" hidden>
+                        <p class="pc-kicker">Desktop bridge needed</p>
+                        <h3>No browser desktop is configured yet.</h3>
+                        <p>
+                            Use Account Security to set the desktop URL, bridge status host, and Guacamole credentials. If you plan to connect from another device, use a public or VPN-reachable hostname instead of localhost.
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
         </section>
     </div>
 </section>
 {% endblock %}
 
 {% block extra_js %}
-<script type="module" src="{% static 'js/Services/PC.js' %}?v=20260429a"></script>
+<script type="module" src="{% static 'js/Services/PC.js' %}?v=20260507a"></script>
 {% endblock %}

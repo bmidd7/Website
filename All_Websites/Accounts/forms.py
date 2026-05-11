@@ -18,21 +18,6 @@ class LoginForm(forms.Form):
 
 
 class UserComputerSettingsForm(forms.ModelForm):
-    access_password_1 = forms.CharField(
-        label="Outer gate password",
-        required=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-    )
-    access_password_2 = forms.CharField(
-        label="Device gate password",
-        required=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-    )
-    access_password_3 = forms.CharField(
-        label="Session gate password",
-        required=False,
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-    )
     current_account_password = forms.CharField(
         label="Current site password",
         required=False,
@@ -61,6 +46,7 @@ class UserComputerSettingsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["guac_username"].label = "Guacamole username"
         self.fields["guac_uses_account_password"].label = "Use my site password for Guacamole"
+        self.fields["desktop_url"].help_text = "Use a public or VPN-reachable URL if you will connect from another device. Localhost only works on the same machine."
         if user:
             self.fields["guac_username"].help_text = f"Leave blank to use your account username: {user.username}"
 
@@ -90,10 +76,6 @@ class UserComputerSettingsForm(forms.ModelForm):
 
     def save(self, commit=True):
         computer = super().save(commit=False)
-        for layer in (1, 2, 3):
-            raw_password = self.cleaned_data.get(f"access_password_{layer}")
-            if raw_password:
-                computer.set_access_password(layer, raw_password)
         if self.cleaned_data.get("guac_uses_account_password"):
             current_account_password = self.cleaned_data.get("current_account_password")
             if current_account_password:
