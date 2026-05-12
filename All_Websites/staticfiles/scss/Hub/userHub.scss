@@ -1,0 +1,185 @@
+@use "userHub.config" as config;
+
+
+.open-sidebar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: config.$open-sidebar-button-size;
+    width: config.$open-sidebar-button-size;
+    font-size: config.$open-sidebar-icon-size;
+    line-height: 1;
+    z-index: 100;
+
+    background-color: transparent;
+    border-color: transparent;
+    color: config.$app-text-color;
+}
+
+.open-sidebar.moused-over {
+    background-color: config.$open-sidebar-hover-color;
+    box-shadow: 0 0 0 2px config.$open-sidebar-hover-color;
+    border-radius: 50%;
+}
+
+#open-sidebar-div {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 100;
+}
+
+
+html,
+body {
+    overflow: hidden;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: config.$app-background;
+    color: config.$app-text-color;
+    font-family: config.$app-font-family;
+    width: 100%;
+    height: 100dvh;
+}
+
+#wrapper-div,
+#main-wrapper {
+    min-height: 100dvh;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+#main-wrapper {
+    padding: 0;
+}
+
+#hub-scene {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    isolation: isolate;
+    z-index: 0;
+}
+
+canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* ── Central orb ── */
+#orb {
+    position: absolute;
+    width: config.$orb-size;
+    height: config.$orb-size;
+    overflow: hidden;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle at 35% 35%,
+        config.$orb-gradient-highlight,
+        config.$orb-gradient-mid 60%,
+        config.$orb-gradient-shadow
+    );
+    box-shadow: config.$orb-box-shadow;
+    transform: translate(-50%, -50%);
+    cursor: default;
+    z-index: config.$orb-z-index;
+    pointer-events: none;
+}
+#account-button {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: inherit;
+    background-color: transparent;
+    cursor: pointer;
+    z-index: config.$account-button-z-index;
+    pointer-events: auto;
+}
+
+/* ── Project nodes ── */
+.node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: config.$node-z-index;
+}
+
+.node button {
+    background: config.$node-button-background;
+    border: 1px solid config.$node-button-border-color;
+    color: config.$node-button-text-color;
+    font-family: inherit;
+    font-size: config.$node-button-font-size;
+    letter-spacing: config.$node-button-letter-spacing;
+    text-transform: uppercase;
+    padding: config.$node-button-padding;
+    border-radius: config.$node-button-border-radius;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: config.$node-button-transition;
+}
+
+.node button:hover {
+    background: config.$node-button-hover-background;
+    border-color: config.$node-button-hover-border-color;
+    color: config.$node-button-hover-text-color;
+    box-shadow: config.$node-button-hover-box-shadow;
+}
+
+#account-button {
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    text-decoration: none;
+    color: config.$account-button-text-color;
+}
+
+.orb-primary-link,
+.orb-auth-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.orb-primary-link {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.orb-auth-links {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.15;
+}
+
+.orb-auth-link {
+    padding: 0.05rem 0;
+}
+
+.orb-auth-link:hover,
+.orb-primary-link:hover {
+    text-decoration: underline;
+}

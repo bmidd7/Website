@@ -19,7 +19,9 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+STATIC_URL = "/static/"
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 
@@ -32,17 +34,18 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECRET_KEY = 'django-insecure-o=b@1#q+t_fhrhuv0*1*5=*i2!2g&m_o*mr+_ch%3c^uuoa2$@'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', "bmiddleton.dev", "www.bmiddleton.dev"]
 
 CSRF_TRUSTED_ORIGINS = [
    # 'http://localhost:8000', 'https://localhost:8000',
     'https://isreal-brainy-irreclaimably.ngrok-free.dev/',
+    "https://bmiddleton.dev", "https://www.bmiddleton.dev"
     ]
 
-'''CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+'''CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SAMESITE = "Lax"'''
 
@@ -91,6 +94,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #sign in providors
     'allauth.account.middleware.AccountMiddleware',
+    #Whitenoise
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 SOCIALACCOUNT_ADAPTER = "Accounts.adapter.MySocialAccountAdapter"

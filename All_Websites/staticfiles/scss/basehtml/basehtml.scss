@@ -1,0 +1,159 @@
+$sidebar-default-width: clamp(5vw, 10vw, 60vw);
+$sidebar-background-color: rgba(255,255,255,.75);
+$sidebar-handle-width: 10px;
+$button-height-width: 32px;
+$hover-over-color: rgba(0,0,0,.5);
+$default-font: YuGothicUI-Bold;
+$text-color: black;
+
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+
+.TEST {
+    background-color: pink;
+}
+
+
+
+.hidden {
+    display: none;
+}
+
+#wrapper-div {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+
+    font-family: $default-font;
+}
+
+
+#main-wrapper {
+    flex-grow: 1;
+    min-width: 0;
+    padding: 2px;
+    padding-left: 5px;
+    position: relative;
+}
+
+#sidebar-handle{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    width: $sidebar-handle-width;
+
+    background-color: transparent;
+
+    cursor: ew-resize;
+    touch-action: none;
+}
+
+
+#sidebar-handle-color{
+    width: 30%;
+
+    background-color: darkslategray;
+}
+
+
+
+
+
+.sidebar {
+    width: 0;
+    min-width: 0;
+    max-width: 80vw;
+    overflow: hidden;
+    transition: width .5s ease;
+    box-sizing: border-box;
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: $sidebar-background-color;
+    z-index: 20;
+}
+
+.sidebar.open{    
+    width: $sidebar-default-width;
+
+    padding: 2px;
+    padding-right: calc(2px + #{$sidebar-handle-width});
+}
+
+
+
+
+#top-sidebar-buttons{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    justify-content: space-between;
+    align-content: center;
+    gap: 2.5px;
+
+    color: $text-color;
+}
+
+
+.sidebar-buttons{
+    display: flex;
+
+    height: $button-height-width;
+    width: $button-height-width;
+
+    background-color: transparent;
+    border-color: transparent;
+    
+    justify-content: center;
+    align-content: center;
+}
+
+.hover-over-buttons.moused-over{
+    background-color: $hover-over-color;
+    box-shadow: 0 0 0 2px $hover-over-color;
+    border-radius: 50%;
+}
+
+
+
+#feedback-type-fieldset{
+    display: flex;
+    flex-direction: row;
+    
+    border: none;
+
+    padding: 0;
+    padding-left: 2px;
+}
+
+#feedback-legend{
+    font-size: 14px;
+}
+
+
+.squircle{
+    height: 100%;
+    border-radius: 25%;
+}
+
+.no-underline{
+    text-decoration: none;
+}
+
+
+
+/*# sourceMappingURL=basehtml.scss.map */

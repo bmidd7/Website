@@ -1,0 +1,19 @@
+#main {
+    display: flex;
+    flex-direction: column;
+}
+
+#top-action-bar {
+    display: flex;
+    flex-direction: row;
+}
+
+#main-body {
+    display: flex;
+    flex-grow: 1;
+}
+
+#TM-Wrapper {
+    display: flex;
+    flex-direction: column;
+}
