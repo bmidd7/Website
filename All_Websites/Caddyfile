@@ -1,3 +1,11 @@
+{
+    admin 127.0.0.1:2020
+}
+
 bmiddleton.dev {
     reverse_proxy 127.0.0.1:8000
+}
+
+remote.bmiddleton.dev {
+    reverse_proxy 127.0.0.1:6022
 }

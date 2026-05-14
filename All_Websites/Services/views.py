@@ -32,7 +32,9 @@ def _pc_for_request(request) -> UserComputer | None:
 
 
 def _pc_desktop_url() -> str:
-    return os.environ.get(PC_DESKTOP_URL_ENV) or os.environ.get(PC_REMOTE_URL_ENV, "")
+    # Try environment variables first, then default to the remote subdomain
+    default_url = "https://remote.bmiddleton.dev"
+    return os.environ.get(PC_DESKTOP_URL_ENV) or os.environ.get(PC_REMOTE_URL_ENV, default_url)
 
 
 def _pc_desktop_url_for_request(request) -> str:

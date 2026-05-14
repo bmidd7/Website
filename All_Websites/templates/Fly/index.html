@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Fly!
+Fly Simulation
 {% endblock %}
 
 {% block extra-css %}
@@ -10,66 +10,87 @@ Fly!
 {% endblock %}
 
 {% block main %}
-<canvas id="canvasDiv">
-
-</canvas>
-<div id="options-wrapper-div">
-    <div id="options" class="grid-container">
-
-        <div class="item">
-            <label for="Length (Sec)">Length (Sec)</label>
-            <input type="number">
+<div id="simulation-page">
+    <div id="options-wrapper-div">
+        <div id="options" class="grid-container">
+            <div class="item">
+                <label for="duration-input">Length (sec)</label>
+                <input id="duration-input" type="number" min="1" step="0.5" value="5">
+            </div>
+            <div class="item">
+                <label for="fps-input">FPS</label>
+                <input id="fps-input" type="number" min="10" max="60" value="30">
+            </div>
+            <div class="item">
+                <label for="quality-select">Quality</label>
+                <select id="quality-select">
+                    <option value="preview">Preview</option>
+                    <option value="high">High</option>
+                    <option value="final">Final</option>
+                </select>
+            </div>
+            <div class="item">
+                <label for="world-select">World</label>
+                <select id="world-select">
+                    <option value="arena">Arena</option>
+                    <option value="open">Open</option>
+                </select>
+            </div>
+            <div class="item">
+                <label for="behavior-select">Behavior</label>
+                <select id="behavior-select">
+                    <option value="wander">Wander</option>
+                    <option value="seek">Seek</option>
+                    <option value="patrol">Patrol</option>
+                    <option value="avoid">Avoid</option>
+                </select>
+            </div>
+            <div class="item">
+                <label for="seed-input">Seed</label>
+                <input id="seed-input" type="number" min="0" value="1">
+            </div>
+            <div class="item">
+                <label for="arena-size-input">World size</label>
+                <input id="arena-size-input" type="number" min="2" step="0.5" value="10">
+            </div>
         </div>
-        <div class="item">
-            <label for="FPS">FPS</label>
-            <input type="number">
+        <div id="submit-button-div">
+            <button id="submit-params" type="button">Run simulation</button>
         </div>
-        <div class="item">
-            <label for="Quality">Quality</label>
-            <select id="Quality-Select">
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-            </select>
-        </div>
-        <div class="item">
-            <label for="World">World</label>
-            <select id="World-Select">
-                <option>Default</option>
-                <option disabled>1</option>
-                <option disabled>2</option>
-                <option disabled>3</option>
-            </select>
-        </div>
-        <div class="item">
-            <label for="Behavior">Behavior</label>
-            <select id="Behavior-Select">
-                <option>Default</option>
-                <option disabled>Dead</option>
-                <option disabled>2</option>
-                <option disabled>3</option>
-            </select>
-        </div>
-        <div class="Seed">
-            <label for="Seed">Seed</label>
-            <input type="number">
-        </div>
-        <div class="item">
-            <label for="World Size">World Size</label>
-            <select id="World-Size">
-                <option>Default</option>
-                <option disabled>1</option>
-                <option disabled>2</option>
-                <option disabled>3</option>
-            </select>
-        </div>
-
     </div>
-    <div id="submit-button-div">
-        <input id="submit-params" type="submit" value="Submit">
+
+    <div id="task-manager-panel">
+        <h3>Task manager</h3>
+        <p id="task-manager-status">Idle</p>
+        <div id="task-progress">
+            <div id="task-progress-bar"></div>
+        </div>
+        <div id="task-progress-label">0% complete</div>
+        <ol id="task-manager-list">
+            <li data-task="prepare">Prepare simulation</li>
+            <li data-task="request">Send API request</li>
+            <li data-task="render">Render frames</li>
+            <li data-task="record">Record video</li>
+        </ol>
+    </div>
+
+    <div id="result-wrapper">
+        <div id="visualization-panel">
+            <canvas id="canvasDiv" width="960" height="540"></canvas>
+            <video id="simulationVideo" controls hidden></video>
+        </div>
+        <div id="status-panel">
+            <p id="simulation-status">Use the form above to run a simulation.</p>
+            <pre id="simulation-summary" class="summary"></pre>
+            <div id="record-controls">
+                <button id="record-button" type="button">Record simulation</button>
+                <a id="download-link" download="fly-simulation.webm" hidden>Download recorded video</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script type="module" src="{% static 'js/Fly/main.js' %}?v=20260513a"></script>
 {% endblock %}

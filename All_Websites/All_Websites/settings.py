@@ -36,12 +36,13 @@ SECRET_KEY = 'django-insecure-o=b@1#q+t_fhrhuv0*1*5=*i2!2g&m_o*mr+_ch%3c^uuoa2$@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', "bmiddleton.dev", "www.bmiddleton.dev"]
+ALLOWED_HOSTS = ['*', "bmiddleton.dev", "www.bmiddleton.dev", "remote.bmiddleton.dev"]
 
 CSRF_TRUSTED_ORIGINS = [
    # 'http://localhost:8000', 'https://localhost:8000',
     'https://isreal-brainy-irreclaimably.ngrok-free.dev/',
-    "https://bmiddleton.dev", "https://www.bmiddleton.dev"
+    "https://bmiddleton.dev", "https://www.bmiddleton.dev",
+    "https://remote.bmiddleton.dev"
     ]
 
 '''CSRF_COOKIE_SECURE = True
