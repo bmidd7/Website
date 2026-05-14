@@ -1,0 +1,633 @@
+@media (min-width: 430px)
+{
+	.googleReviewStars
+	{
+		font-size:15px;
+	}
+}
+
+@media (min-width: 992px)
+{
+	.domainManagementDomainNameContainer
+	{
+		min-height:55px;
+	}
+
+	.containerForce100 
+	{
+    		width: 100% !important;
+	}
+
+	.sideBarSearchResults
+	{
+		width:153px;
+	}
+}
+
+@media (min-width: 768px)
+{
+	.containerForce100 
+	{
+    		width: 100% !important;
+	}
+}
+
+@media (max-width: 992px)
+{
+	.headerMenuLink
+	{
+		font-size: 14px;;
+	}
+}
+
+@media (max-width: 1200px)
+{
+	#domainSearchButton
+	{
+		bottom: 0px;
+	}
+}
+
+@media (min-width: 1200px)
+{
+	.sideBarSearchResults
+	{
+        	border: 1px solid gray;
+	        padding:10px;
+        	//height:153px;
+        	margin:10px;
+		width:153px;
+	}
+
+	.searchResultRowOptionsSideBar
+	{
+		//padding-right: 20px;
+	}
+}
+
+@media (max-width: 1376px)
+{
+	.googleReviewStars
+	{
+		font-size:20px;
+	}
+
+	#googleReviewLogo
+	{
+		width:80px;
+	}
+}
+
+@media (max-width: 1366px)
+{
+	.bodyHome
+	{
+		background-attachment: scroll;
+	}
+
+	.modal-xlg
+	{
+	        width: 1199px;
+	}
+}
+
+@media (max-width: 1199px)
+{
+	.searchResultRowOptionsSideBar
+	{
+		//padding-right: 10px;
+	}
+
+	.sideBarSearchResults
+	{
+	        padding:5px;
+        	//height:153px;
+        	margin:10px;
+	}
+
+	#homepageBlurb
+	{
+		font-size: 30px;
+		line-height: inherit;
+		padding-bottom: 10px;
+	}
+
+	.modal-xlg
+	{
+	        width: 900px;
+	}
+
+	.cartSummaryBoxFreeListHeader
+	{
+		font-size: smaller;
+	}
+
+	.cartSummaryBoxFreeList
+	{
+		font-size: smaller;
+	}
+
+	.dealsRegularBox
+	{
+		font-size:smaller;
+	}
+
+	.productPageHeaderContainer
+	{
+		height: 268px;
+	}
+
+	.mobileAlignLeft
+	{
+		text-align: left;
+	}
+
+	.checkbox .cr, .radio .cr 
+	{
+    		width: 20px;
+    		height: 20px;
+    		margin-right: 10px;
+    		margin-top: 3px;
+	}
+
+	.checkbox .cr .cr-icon, .radio .cr .cr-icon 
+	{
+    		font-size: 12px;
+	}
+
+	body
+	{
+		color: black;
+	}
+
+	#footerPig
+	{
+		display: none;
+	}
+
+	.featuresFlexItem
+	{
+		margin-bottom: 45px;
+	}
+}
+
+@media (max-width: 991px)
+{
+	#domainManagementFiltersContainerParent
+	{
+		margin-bottom: 30px;
+	}
+
+	.domainManagementIconButton
+	{
+		height: 32px;
+		width: 32px;
+		font-size: 1em;
+	}
+
+	.searchResultRowOptionsSideBar
+	{
+		//padding-right: 10px;
+	}
+
+	.domainManagementDetailsButtonContainer
+	{
+		padding-right: 5px;
+	}
+
+	.domainManagementRow
+	{
+/*
+		padding-top: 10px !important;
+		padding-bottom: 10px !important;
+*/
+	}
+
+	#domainManagementFiltersContainer
+	{
+		margin-bottom: 10px;
+	}
+
+	#domainManagementBulkActionsButtonContainer
+	{
+		float: none;
+		margin-bottom: 10px;
+	}
+
+	#domainManagementBulkActionsButton
+	{
+		display: block;
+		width: 100%;
+	}
+
+	.cartItemAddService
+	{
+		padding-bottom:5px;
+	}
+
+	.pageHeaderContainer
+	{
+		padding-bottom:10px;
+	}
+
+	.pageSubHeaderText
+	{
+		font-size: 30px;
+	}
+
+	.pageHeaderText
+	{
+		margin-top:10px;
+		font-size: 35px;
+	}
+
+	.collapseHeaderContainer.in
+	{
+	        background-color: #faf9f9;
+	}
+
+	.homePageQuoteOneRight, .homePageQuoteOneSignup
+	{
+		height: 50%;
+	}
+
+	.featuresFlexItem
+	{
+		margin-bottom: 45px;
+	}
+
+	.BeaconFabButtonFrame
+	{
+		display:none !important;
+	}
+
+	.dropdown-menu
+	{
+        	font-size: 20px;
+	}
+
+	.dropdown-menu>li>a
+	{
+		line-height: 2.5;
+	}
+
+	.productPageHeaderContainer
+	{
+		height: 200px;
+	}
+
+	.btn-group-justified>.btn-group 
+	{
+    		display: inline-block; 
+    		float: none; 
+    		width: auto; 
+	}
+
+	.modal-content
+	{
+	        padding: 0px;
+	}
+
+	#homepageBlurbContainer
+	{
+	 	margin-left: auto;
+	}
+
+	#homePageQuoteImageOne
+	{
+		margin-bottom: 1000px;
+	}
+
+	#homePageQuoteImageTwo
+	{
+		margin-bottom: 500px;
+	}
+
+	.homePagePricingOption
+	{
+		margin-bottom: 40px;
+	}
+
+	.homePageSupportOption
+	{
+		margin-bottom: 40px;
+	}
+
+	.homePagePricingOptionCenter
+	{
+		border-right: 0px;
+		border-left: 0px;
+	}
+
+	.homePageSupportOptionCenter
+	{
+		border-right: 0px;
+		border-left: 0px;
+	}
+
+	.supportStructureDescription
+	{
+		height: auto;
+	}
+
+	.orgLogo
+	{
+		padding-bottom: 40px;
+	}
+}
+
+@media (max-width: 892px)
+{
+}
+
+@media (max-width: 767px)
+{
+        .domainManagementRow
+        {
+/*                min-height:105px !important; */
+        }
+
+	.domainManagementDomainListExpireDetails
+	{
+		/* margin-top:20px; */
+	}
+
+	.promotedTldsTld
+	{
+		font-size:smaller;
+	}
+
+	.sideBarSearchResults
+	{
+	        padding:5px;
+	}
+
+	#searchResultsDomainContainerSide
+	{
+		margin-bottom:15px;
+	}
+
+	#domainsPricingCategoryPanels
+	{
+		margin-top: 0px;
+	}
+
+	#domainManagementHeader
+	{
+		font-size: 30px;
+	}
+
+	.homepageReviewsContainer
+	{
+		padding-top:8px;
+		padding-bottom:0px;
+	        background-color: var(--porkbun_white);
+        	background-color: rgba(255, 255, 255, 0.7);
+	}
+
+	.homepageReviewsContainerGoogle
+	{
+		bottom:36px;
+		padding-top:8px;
+		padding-bottom:0px;
+	        background-color: var(--porkbun_white);
+        	background-color: rgba(255, 255, 255, 0.7);
+	}
+
+	.googleReviewPart
+	{
+		/*display: inline;*/
+		padding-right:10px;
+		padding-left:10px;
+	}
+
+	.cartItemAddService
+	{
+		font-size: smaller;
+	}
+
+	.searchAddRemoveIcon
+	{
+		font-size: 25px !important;
+	}
+
+	.searchResultRowTable
+	{
+		padding-top:10px;
+		padding-bottom:10px;
+	}
+
+	.domainsPricingTrendingItem
+	{
+		width:103px;
+		height:215px;
+	}
+
+	.pageHeaderContainer
+	{
+		padding-bottom:10px;
+	}
+
+	.pricingStructureDescription
+	{
+		height:auto;
+	}
+
+	.pageSubHeaderText
+	{
+		font-size: 18px;
+	}
+
+	.pageHeaderText
+	{
+		margin-top:10px;
+		font-size: 20px;
+	}
+
+	.tldPageHeaderSearchContainer
+	{
+		margin-bottom:0px;
+	}
+
+	#tldPageBackgroundImage
+	{
+		height: 190px;
+	}
+
+	#tldPageHeaderSearchBlurb
+	{
+		font-size: 20px;
+	}
+
+	#homePageStandardFeaturesContainer
+	{
+		padding: 20px;
+	}
+
+	.featuresFlexItem
+	{
+		margin-bottom: 45px;
+	}
+
+	#tldLandingPageMainContent
+	{
+		margin-top:45px;
+	}
+
+	.cartRenewsAt
+	{
+		margin-top: 0px !important;
+	}
+
+	#homepageBlurb
+	{
+		font-size: 20px;
+		line-height: inherit;
+	}
+
+	#homepageBlurbTagline
+	{
+		font-size: 15px;
+	}
+
+	.domainsPricingAllExtensionsItem, .badge
+	{
+		font-size: smaller !important;
+	}
+
+	.domainsPricingAllExtensionsHeader
+	{
+		font-size: x-small !important;
+	}
+
+	.searchResultRowDomain
+	{
+		height: 35px;
+	}
+
+	.searchResultRowPrice
+	{
+		text-align: right;
+		height: auto;
+	}
+
+	.mobileCartItemRemove
+	{
+		display: inline;
+	}
+
+	.desktopCartItemRemove
+	{
+		display: none;
+	}
+
+	.cartBoxDomain
+	{
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.cartRow
+	{
+		height: auto;
+		margin-bottom: 20px;
+	}
+
+	.cartRowType
+	{
+		margin-bottom: 5px;
+	}
+
+	#homepageTopContainer
+	{
+//		background-size: 300px;
+	}
+
+	.verticalAlignHelper
+	{
+		display:none;
+	}
+
+	#genericPartnerLogo
+	{
+	}
+
+	.hamburgerMenu
+	{
+	}
+
+	.sloganLine
+	{
+		text-align:center;
+		font-size: 80%;
+	}
+
+	#headerRow
+	{
+		height: 90px;
+		padding-top: 10px;
+	}
+}
+
+@media (max-height: 700px; max-width: 767px;)
+{
+	.productPageHeaderContainer
+	{
+		height: 168px;
+	}
+
+	#homepageBlurb
+	{
+		font-size: 20px;
+		line-height: inherit;
+	}
+
+	#homepageBlurbTagline
+	{
+		font-size: 15px;
+	}
+}
+
+@media (max-width: 500px)
+{
+	.productPageHeaderContainer
+	{
+		height: 168px;
+	}
+
+	#homepageBlurb
+	{
+		font-size: 16px;
+	}
+
+	.priceDisplayHome
+	{
+		font-size:smaller;
+	}
+}
+
+@media (max-width: 349px)
+{
+	.badge-porkbun
+	{
+		white-space: normal;
+	}
+
+	.sideBarSearchResults
+	{
+		min-height: 170px;
+	}
+
+@media (max-width: 300px)
+{
+	.priceDisplayHome
+	{
+		font-size:8px;
+	}
+
+	#headerBrandLogo
+	{
+		display:none;;
+	}
+}
+

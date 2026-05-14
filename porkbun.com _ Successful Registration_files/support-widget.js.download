@@ -1,0 +1,1505 @@
+/**
+ * Unified Support Widget - Replaces Helpscout Beacon
+ * AI Chat + Helpscout Escalation Integration
+ *
+ * This widget provides:
+ * - AI-powered chat using existing RAG API
+ * - Seamless escalation to Helpscout with full context
+ * - Single unified support interface
+ */
+
+var SupportWidget = {
+    // State management
+    isOpen: false,
+    sessionId: null,
+    chatHistory: [],
+    totalQueries: 0,
+    lastQuery: null,
+    hasActiveSessionMessages: false, // Track if user has sent messages in current session (not restored)
+    isEscalated: false, // Track if user has escalated to human (chat bubble should reopen Beacon)
+    isLoggedIn: false,  // Track login state (fetched on init for action authorization)
+    pendingAction: null,      // Stores a pending action_required while waiting for domain input or confirm
+    awaitingDomain: false,    // True when RAG returned an action with no domain and we asked the user
+    lastActionedDomain: null, // The most recently confirmed domain action (for follow-up context)
+
+    // DOM references (cached for performance)
+    $launcher: null,
+    $window: null,
+    $messages: null,
+    $input: null,
+    $sendBtn: null,
+    $escalateBtn: null,
+    $welcome: null,
+
+    /**
+     * Initialize the widget
+     */
+    init: function() {
+        console.log('[SupportWidget] Initializing...');
+
+        // Cache DOM elements
+        this.$launcher = $('#supportWidgetLauncher');
+        this.$window = $('#supportWidgetWindow');
+        this.$messages = $('#supportWidgetMessages');
+        this.$input = $('#supportWidgetInput');
+        this.$sendBtn = $('#supportWidgetSend');
+        this.$escalateBtn = $('#supportWidgetEscalate');
+        this.$welcome = $('#supportWidgetWelcome');
+
+        // Bind events
+        this.bindEvents();
+
+        // Restore session if exists, or generate new session_id
+        this.restoreSession();
+
+        // Ensure session_id exists (generate if not restored)
+        if (!this.sessionId) {
+            this.sessionId = this.generateSessionId();
+            console.log('[SupportWidget] Generated new session_id:', this.sessionId);
+        }
+
+        console.log('[SupportWidget] Initialized successfully');
+
+        // Adjust position if cookie banner is visible
+        this.adjustForCookieBanner();
+
+        // Fetch login state so we can authorize domain actions
+        this.checkLoginState();
+
+        // Reopen widget if it was open before the page refresh
+        try {
+            if (localStorage.getItem('support_widget_open') === 'true') {
+                this.open();
+            }
+        } catch (e) {}
+
+    },
+
+    /**
+     * Push widget up if cookie consent banner is visible
+     */
+    adjustForCookieBanner: function() {
+        var self = this;
+        var $banner = $('#cookie-banner');
+        if (!$banner.length) return;
+
+        function adjust() {
+            var bannerHeight = $banner.is(':visible') ? $banner.outerHeight() : 0;
+            var offset = bannerHeight > 0 ? bannerHeight + 10 : '';
+            self.$launcher.css('bottom', offset ? (offset + 20) + 'px' : '');
+            self.$window.css('bottom', offset ? (offset + 95) + 'px' : '');
+        }
+
+        adjust();
+
+        // Watch for banner being hidden/removed
+        var observer = new MutationObserver(function() {
+            adjust();
+        });
+        observer.observe($banner[0], { attributes: true, childList: false, subtree: false });
+    },
+
+    /**
+     * Bind all event listeners
+     */
+    bindEvents: function() {
+        var self = this;
+
+        // Launcher button - toggle widget
+        this.$launcher.on('click', function() {
+            self.toggle();
+        });
+
+        // Close button
+        $('#supportWidgetClose').on('click', function() {
+            self.close();
+        });
+
+        // Minimize button
+        $('#supportWidgetMinimize').on('click', function() {
+            self.close();
+        });
+
+        // Clear history button
+        $('#supportWidgetClear').on('click', function() {
+            if (confirm('Clear chat history and start a new conversation?')) {
+                self.clearHistory();
+            }
+        });
+
+        // Input field - enable/disable send button
+        this.$input.on('input', function() {
+            var hasText = $(this).val().trim().length > 0;
+            self.$sendBtn.prop('disabled', !hasText);
+        });
+
+        // Input field - auto-resize
+        this.$input.on('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Input field - Enter to send (Shift+Enter for new line)
+        this.$input.on('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!self.$sendBtn.prop('disabled')) {
+                    self.sendMessage();
+                }
+            }
+        });
+
+        // Send button
+        this.$sendBtn.on('click', function() {
+            self.sendMessage();
+        });
+
+        // Escalate button
+        this.$escalateBtn.on('click', function() {
+            self.escalateToHuman();
+        });
+
+        // Quick action buttons
+        $(document).on('click', '.support-widget-quick-action', function() {
+            var message = $(this).data('message');
+            self.$input.val(message);
+            self.$sendBtn.prop('disabled', false);
+            self.sendMessage();
+        });
+
+        // Track Helpscout Beacon state
+        this.beaconIsOpen = false;
+        if (typeof window.Beacon !== 'undefined') {
+            try {
+                window.Beacon('on', 'open', function() {
+                    self.beaconIsOpen = true;
+                    if (self.isEscalated) {
+                        $('#supportWidgetBackToAI').show();
+                    }
+                });
+                window.Beacon('on', 'close', function() {
+                    self.beaconIsOpen = false;
+                    $('#supportWidgetBackToAI').hide();
+                });
+            } catch (err) {
+                console.log('[SupportWidget] Beacon event listener error:', err);
+            }
+        }
+
+        // Back to AI Chat button
+        $('#supportWidgetBackToAI').on('click', function() {
+            $('#supportWidgetBackToAI').hide();
+            if (typeof window.Beacon !== 'undefined') {
+                window.Beacon('close');
+            }
+            self.isEscalated = false;
+            sessionStorage.removeItem('support_widget_escalated');
+            self.open();
+        });
+
+        // Click outside to close widgets - using mousedown to run before click handlers
+        $(document).on('mousedown', function(e) {
+            // Only run if at least one widget is open
+            if (!self.isOpen && !self.beaconIsOpen) {
+                return;
+            }
+
+            var $target = $(e.target);
+
+            // Check if our widget is open
+            if (self.isOpen) {
+                // Don't close if clicking inside the widget window or launcher
+                if (!$target.closest('#supportWidgetWindow').length &&
+                    !$target.closest('#supportWidgetLauncher').length) {
+                    self.close();
+                }
+            }
+
+            // Check if Helpscout Beacon is open
+            if (self.beaconIsOpen && typeof window.Beacon !== 'undefined') {
+                try {
+                    // More comprehensive Beacon selectors including iframe and all Beacon elements
+                    var isBeaconClick = $target.closest('#beacon-container, .BeaconContainer, [id*="beacon"], [class*="Beacon"], [data-beacon], iframe[id*="beacon"], #supportWidgetBackToAI').length > 0;
+
+                    // Also check if clicking on any element with Beacon in the ID or class
+                    var targetId = $target.attr('id') || '';
+                    var targetClass = $target.attr('class') || '';
+                    if (targetId.toLowerCase().includes('beacon') || targetClass.toLowerCase().includes('beacon')) {
+                        isBeaconClick = true;
+                    }
+
+                    if (!isBeaconClick) {
+                        window.Beacon('close');
+                    }
+                } catch (err) {
+                    console.log('[SupportWidget] Beacon close error:', err);
+                }
+            }
+        });
+    },
+
+    /**
+     * Toggle widget open/closed
+     */
+    toggle: function() {
+        // If user has escalated to human, reopen Beacon instead of AI widget
+        if (this.isEscalated && typeof window.Beacon !== 'undefined') {
+            window.Beacon('open');
+            return;
+        }
+        if (this.isOpen) {
+            this.close();
+        } else {
+            this.open();
+        }
+    },
+
+    /**
+     * Open widget
+     */
+    open: function() {
+        console.log('[SupportWidget] Opening widget');
+        this.$window.addClass('open').removeClass('hidden');
+        this.isOpen = true;
+
+        // Update ARIA attributes
+        this.$launcher.attr('aria-expanded', 'true');
+        this.$window.attr('aria-hidden', 'false');
+
+        // Focus the input field for keyboard users
+        setTimeout(function() {
+            this.$input.focus();
+        }.bind(this), 100);
+
+        // Save state
+        this.saveState();
+
+        // Scroll to bottom
+        this.scrollToBottom();
+    },
+
+    /**
+     * Close widget
+     */
+    close: function() {
+        console.log('[SupportWidget] Closing widget');
+        this.$window.removeClass('open');
+        this.isOpen = false;
+
+        // Update ARIA attributes
+        this.$launcher.attr('aria-expanded', 'false');
+        this.$window.attr('aria-hidden', 'true');
+
+        // Return focus to launcher button for keyboard users
+        this.$launcher.focus();
+
+        // Save state
+        this.saveState();
+    },
+
+    /**
+     * Send a message to the AI
+     */
+    sendMessage: function() {
+        var message = this.$input.val().trim();
+
+        if (!message) {
+            return;
+        }
+
+        // If we're waiting for the user to provide a domain for a pending action,
+        // treat this input as the domain name rather than a new chat query.
+        if (this.awaitingDomain && this.pendingAction) {
+            // Strip natural language prefixes and normalize
+            var domainInput = message.toLowerCase().trim().replace(/^(for|my)\s+/, '');
+            // If it doesn't look like a domain (no dot), cancel the action and fall through to RAG
+            if (domainInput.indexOf('.') === -1) {
+                this.awaitingDomain = false;
+                this.pendingAction = null;
+            } else {
+                this.awaitingDomain = false;
+                this.addMessage('user', message);
+                this.$input.val('');
+                this.$input.css('height', 'auto');
+                this.$sendBtn.prop('disabled', true);
+                this.$welcome.fadeOut();
+                this.showActionConfirmCard(this.pendingAction, domainInput);
+                return;
+            }
+        }
+
+        console.log('[SupportWidget] Sending message:', message);
+
+        // Store for potential web search
+        this.lastQuery = message;
+
+        // Add user message to UI
+        this.addMessage('user', message);
+
+        // Clear input
+        this.$input.val('');
+        this.$input.css('height', 'auto');
+        this.$sendBtn.prop('disabled', true);
+
+        // Hide welcome message
+        this.$welcome.fadeOut();
+
+        // Show typing indicator
+        this.showTypingIndicator();
+
+        // Build request data
+        var requestData = {
+            query: message
+        };
+
+        if (this.sessionId) {
+            requestData.session_id = this.sessionId;
+        }
+
+        // Send to API
+        $.ajax({
+            url: '/tools/support_chat_api',
+            type: 'POST',
+            data: requestData,
+            dataType: 'json',
+            timeout: 60000,
+            success: function(data) {
+                this.hideTypingIndicator();
+
+                if (data.success) {
+                    // Store session ID
+                    if (data.session_id) {
+                        this.sessionId = data.session_id;
+                    }
+
+                    // Add bot response
+                    this.addMessage('bot', data.response, data.sources, data.web_search_suggested);
+
+                    // If user asked for human support, offer escalation button
+                    if (data.human_requested) {
+                        this.addHumanRequestPrompt();
+                    }
+
+                    // Track stats
+                    this.totalQueries++;
+                    this.hasActiveSessionMessages = true;
+
+                    // Handle domain management action if RAG detected one
+                    if (data.action_required) {
+                        this.handleActionRequired(data.action_required);
+                    }
+
+                    // Save session AFTER bot response is added to chatHistory
+                    this.saveSession();
+
+                    // Refocus input after response
+                    this.$input.focus();
+                } else {
+                    this.addMessage('bot',
+                        'Sorry, I encountered an issue: ' + (data.error || 'Unknown error') +
+                        '\n\nPlease try again or click "Talk to a human" below to reach our support team.');
+                }
+            }.bind(this),
+            error: function(xhr, status, error) {
+                this.hideTypingIndicator();
+                this.addMessage('bot',
+                    'Sorry, I\'m having trouble connecting right now. Please try again in a moment or click "Talk to a human" below for immediate assistance.');
+                console.error('[SupportWidget] API error:', error);
+            }.bind(this)
+        });
+    },
+
+    /**
+     * Add a message to the UI only (for restoring from localStorage)
+     * Does NOT add to chatHistory to avoid duplication
+     *
+     * @param {string} role - 'user', 'bot', or 'system'
+     * @param {string} content - Message content
+     * @param {array} sources - Optional array of source links
+     */
+    addMessageToUI: function(role, content, sources) {
+        // Create message element
+        var $message = $('<div>').addClass('support-widget-message').addClass(role);
+
+        // Add label
+        var label = role === 'user' ? 'You' : (role === 'bot' ? 'Support Assistant' : 'System');
+        var $label = $('<div>').addClass('support-widget-message-label').text(label);
+        $message.append($label);
+
+        // Add message bubble
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+
+        if (role === 'bot') {
+            $bubble.html(this.formatResponse(content));
+        } else {
+            $bubble.text(content);
+        }
+
+        $message.append($bubble);
+
+        // Add sources if present
+        if (sources && sources.length > 0 && role === 'bot') {
+            var $sources = $('<div>').addClass('support-widget-message-sources');
+            $sources.append($('<div>').addClass('support-widget-message-sources-title').text('Related Articles:'));
+
+            for (var i = 0; i < Math.min(sources.length, 3); i++) {
+                var $link = $('<a>')
+                    .addClass('support-widget-message-source-link')
+                    .attr('href', sources[i].url)
+                    .attr('target', '_blank')
+                    .text(sources[i].title);
+                $sources.append($link);
+            }
+
+            $message.append($sources);
+        }
+
+        // Append to messages container
+        this.$messages.append($message);
+
+        // Scroll to the top of the new message
+        this.scrollToMessage($message);
+    },
+
+    /**
+     * Add a message to the chat
+     *
+     * @param {string} role - 'user', 'bot', or 'system'
+     * @param {string} content - Message content
+     * @param {array} sources - Optional array of source links
+     * @param {boolean} webSearchSuggested - Show web search prompt
+     */
+    addMessage: function(role, content, sources, webSearchSuggested) {
+        var timestamp = new Date().toISOString();
+
+        // Store in chat history (for escalation)
+        this.chatHistory.push({
+            role: role,
+            content: content,
+            sources: sources || [],
+            timestamp: timestamp
+        });
+
+        // Create message element
+        var $message = $('<div>').addClass('support-widget-message').addClass(role);
+
+        // Add label
+        var label = role === 'user' ? 'You' : (role === 'bot' ? 'Support Assistant' : 'System');
+        var $label = $('<div>').addClass('support-widget-message-label').text(label);
+        $message.append($label);
+
+        // Add message bubble
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+
+        if (role === 'bot') {
+            $bubble.html(this.formatResponse(content));
+        } else {
+            $bubble.text(content);
+        }
+
+        $message.append($bubble);
+
+        // Add sources if present
+        if (sources && sources.length > 0 && role === 'bot') {
+            var $sources = $('<div>').addClass('support-widget-message-sources');
+            $sources.append($('<div>').addClass('support-widget-message-sources-title').text('Related Articles:'));
+
+            for (var i = 0; i < Math.min(sources.length, 3); i++) {
+                var $link = $('<a>')
+                    .addClass('support-widget-message-source-link')
+                    .attr('href', sources[i].url)
+                    .attr('target', '_blank')
+                    .text(sources[i].title);
+                $sources.append($link);
+            }
+
+            $message.append($sources);
+        }
+
+        // Add web search suggestion if present
+        if (webSearchSuggested && role === 'bot') {
+            this.showEscalationPrompt("I don't have specific information about this in our knowledge base. Would you like to talk to a human support agent?");
+        }
+
+        // Append to messages container
+        this.$messages.append($message);
+
+        // Scroll to the top of the new message
+        this.scrollToMessage($message);
+    },
+
+    /**
+     * Add a system message
+     */
+    addSystemMessage: function(content) {
+        this.addMessage('system', content);
+    },
+
+    /**
+     * Add a prompt offering to connect with human support
+     */
+    addHumanRequestPrompt: function() {
+        var self = this;
+
+        // Create special message element
+        var $message = $('<div>')
+            .addClass('support-widget-message bot')
+            .addClass('human-request-prompt');
+
+        // Add label
+        var $label = $('<div>')
+            .addClass('support-widget-message-label')
+            .text('Support Assistant');
+        $message.append($label);
+
+        // Add message bubble with button
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+
+        $bubble.html(
+            '<p><strong>Would you like to speak with a human agent?</strong></p>' +
+            '<p>I can connect you right now with our support team.</p>' +
+            '<button class="support-widget-escalate-inline" style="' +
+                'background: #28a745; color: white; border: none; padding: 10px 20px; ' +
+                'border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; ' +
+                'margin-top: 10px; width: 100%;' +
+            '">💬 Connect Me to Human Support</button>'
+        );
+
+        $message.append($bubble);
+
+        // Append to messages
+        this.$messages.append($message);
+        this.scrollToBottom();
+
+        // Bind click event to inline escalate button
+        $message.find('.support-widget-escalate-inline').on('click', function() {
+            console.log('[SupportWidget] Inline escalation button clicked');
+            self.escalateToHuman();
+        });
+    },
+
+    /**
+     * Format bot response with basic markdown
+     */
+    formatResponse: function(text) {
+        // Escape HTML first
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(text));
+        text = div.innerHTML;
+
+        // Apply markdown-like formatting
+        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+        text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        text = text.replace(/^- (.+)$/gm, '<li>$1</li>');
+        text = text.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+
+        // Convert double newlines to paragraphs
+        var paragraphs = text.split('\n\n');
+        text = paragraphs.map(function(p) {
+            if (p.trim().startsWith('<')) {
+                return p; // Already has HTML tags
+            }
+            return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+        }).join('');
+
+        return text;
+    },
+
+    /**
+     * Show typing indicator
+     */
+    showTypingIndicator: function() {
+        var $indicator = $('<div>')
+            .attr('id', 'supportWidgetTyping')
+            .addClass('support-widget-message bot');
+
+        $indicator.append($('<div>').addClass('support-widget-message-label').text('Support Assistant'));
+
+        var $typing = $('<div>').addClass('support-widget-message-bubble');
+        $typing.append($('<div>').addClass('support-widget-typing')
+            .append($('<span>'))
+            .append($('<span>'))
+            .append($('<span>'))
+        );
+
+        $indicator.append($typing);
+        this.$messages.append($indicator);
+        this.scrollToMessage($indicator);
+    },
+
+    /**
+     * Hide typing indicator
+     */
+    hideTypingIndicator: function() {
+        $('#supportWidgetTyping').remove();
+    },
+
+    /**
+     * Show escalation prompt
+     */
+    showEscalationPrompt: function(message) {
+        this.addSystemMessage(message || "Would you like to talk to a human support agent?");
+    },
+
+    /**
+     * Escalate to Helpscout with chat history
+     */
+    escalateToHuman: function() {
+        console.log('[SupportWidget] Escalating to human support');
+        var self = this;
+
+        // Show transition message
+        this.addSystemMessage('Connecting you to our support team...');
+
+        // Format chat history for Helpscout
+        var context = this.formatContextForHelpscout();
+
+        // Small delay for visual continuity
+        setTimeout(function() {
+            try {
+                // Check if Beacon is available
+                if (typeof window.Beacon === 'undefined') {
+                    console.error('[SupportWidget] Helpscout Beacon not loaded');
+                    this.addSystemMessage('Unable to connect to support. Please email us at support@porkbun.com');
+                    return;
+                }
+
+                // Reset Beacon to clear any cached data
+                window.Beacon('reset');
+
+                // Only prefill with chat context if user has asked questions
+                if (context.trim().length > 0) {
+                    // Convert to HTML: newlines to <br>, labels to bold
+                    var htmlContext = context.replace(/\n/g, '<br>');
+                    htmlContext = htmlContext.replace(/(\[\d+\] (?:CUSTOMER|AI ASSISTANT)[^:]*:)/g, '<strong>$1</strong>');
+
+                    // Pre-fill Beacon with plain text (email body doesn't support HTML)
+                    window.Beacon('prefill', {
+                        text: context
+                    });
+
+                    // Add session data (visible to agents in chat sidebar)
+                    window.Beacon('session-data', {
+                        'AI Chat History': htmlContext.substring(0, 5000), // Limit to 5000 chars
+                        'Session ID': this.sessionId || 'N/A',
+                        'Total Queries': this.totalQueries.toString(),
+                        'Escalation Source': 'AI Support Widget'
+                    });
+                } else {
+                    // User went straight to human without any AI interaction
+                    window.Beacon('session-data', {
+                        'Straight to Human': 'Yes'
+                    });
+                }
+
+                // Navigate to contact selection (email or chat)
+                window.Beacon('navigate', '/ask/');
+
+                // Open Beacon
+                window.Beacon('open');
+
+                // Log escalation to database
+                var interactionCount = self.chatHistory.filter(function(msg) { return msg.role === 'user'; }).length;
+                $.post('/tools/support_widget_escalate', {
+                    session_id: self.sessionId || '',
+                    chat_history: JSON.stringify(self.chatHistory),
+                    interaction_count: interactionCount
+                })
+                .fail(function(xhr, status, error) {
+                    console.error('[SupportWidget] Escalation logging failed:', error);
+                });
+
+                // Mark as escalated so chat bubble reopens Beacon instead of AI widget
+                this.isEscalated = true;
+                sessionStorage.setItem('support_widget_escalated', Date.now().toString());
+
+                // Hide our widget to avoid overlap
+                this.minimizeWidget();
+            } catch (error) {
+                console.error('[SupportWidget] Escalation error:', error);
+                this.addSystemMessage('Unable to open support chat. Please email us at support@porkbun.com');
+            }
+        }.bind(this), 800);
+    },
+
+    /**
+     * Format chat history for Helpscout ticket
+     */
+    formatContextForHelpscout: function() {
+        // Only include context if user has sent messages in the CURRENT session
+        // (don't prefill for restored sessions or cleared history)
+        if (!this.hasActiveSessionMessages) {
+            return '';
+        }
+
+        var context = '=== CHAT ESCALATED FROM AI ASSISTANT ===\n\n';
+
+        if (this.sessionId) {
+            context += 'Session ID: ' + this.sessionId + '\n';
+        }
+
+        context += 'Timestamp: ' + new Date().toISOString() + '\n';
+        context += 'Total queries: ' + this.totalQueries + '\n\n';
+        context += '=== Conversation History ===\n\n';
+
+        this.chatHistory.forEach(function(msg, index) {
+            // Skip system messages in context
+            if (msg.role === 'system') {
+                return;
+            }
+
+            var role = msg.role === 'user' ? 'CUSTOMER' : 'AI ASSISTANT';
+            var timestamp = '';
+
+            if (msg.timestamp) {
+                try {
+                    timestamp = ' (' + new Date(msg.timestamp).toLocaleTimeString() + ')';
+                } catch (e) {
+                    // Ignore timestamp formatting errors
+                }
+            }
+
+            context += '[' + (index + 1) + '] ' + role + timestamp + ':\n';
+            context += msg.content + '\n\n';
+
+            if (msg.sources && msg.sources.length > 0) {
+                context += '   📚 Sources referenced:\n';
+                msg.sources.forEach(function(source) {
+                    context += '   • ' + source.title + '\n';
+                    context += '     ' + source.url + '\n';
+                });
+                context += '\n';
+            }
+        });
+
+        context += '=== END CHAT HISTORY ===\n\n';
+        context += 'Customer requested assistance from human support agent.\n';
+
+        return context;
+    },
+
+    /**
+     * Minimize widget after escalation
+     */
+    minimizeWidget: function() {
+        // Option A: Hide completely
+        this.close();
+
+        // Option B: Keep minimized state with indicator
+        // this.$window.addClass('minimized');
+        // this.$launcher.addClass('active-human-chat');
+    },
+
+    /**
+     * Scroll to a specific message element
+     */
+    scrollToMessage: function($message) {
+        if (!$message || !$message.length) {
+            return;
+        }
+
+        var messagesContainer = this.$messages[0];
+        if (messagesContainer) {
+            setTimeout(function() {
+                // Get the position of the message relative to the container
+                var messageTop = $message.position().top;
+                var containerScrollTop = messagesContainer.scrollTop;
+
+                // Scroll so the message starts near the top of the visible area
+                // Add a small offset (50px) so there's some breathing room
+                messagesContainer.scrollTop = containerScrollTop + messageTop - 50;
+            }, 100);
+        }
+    },
+
+    /**
+     * Scroll messages to bottom (used for initial load)
+     */
+    scrollToBottom: function() {
+        var messages = this.$messages[0];
+        if (messages) {
+            setTimeout(function() {
+                messages.scrollTop = messages.scrollHeight;
+            }, 100);
+        }
+    },
+
+    /**
+     * Generate a unique session ID
+     */
+    generateSessionId: function() {
+        var timestamp = Date.now().toString(36);
+        var random = Math.random().toString(36).substring(2, 15);
+        var random2 = Math.random().toString(36).substring(2, 15);
+        return 'sw_' + timestamp + '_' + random + random2;
+    },
+
+    /**
+     * Save session data to localStorage
+     */
+    saveSession: function() {
+        if (this.sessionId) {
+            try {
+                localStorage.setItem('support_widget_session', this.sessionId);
+                localStorage.setItem('support_widget_history', JSON.stringify(this.chatHistory));
+            } catch (e) {
+                console.warn('[SupportWidget] Unable to save session:', e);
+            }
+        }
+    },
+
+    /**
+     * Restore session from localStorage
+     */
+    restoreSession: function() {
+        try {
+            var sessionId = localStorage.getItem('support_widget_session');
+            var history = localStorage.getItem('support_widget_history');
+            var escalated = sessionStorage.getItem('support_widget_escalated');
+
+            if (escalated) {
+                var hoursSinceEscalation = (Date.now() - parseInt(escalated)) / (1000 * 60 * 60);
+                if (hoursSinceEscalation < 24) {
+                    this.isEscalated = true;
+                } else {
+                    sessionStorage.removeItem('support_widget_escalated');
+                }
+            }
+
+            if (sessionId) {
+                this.sessionId = sessionId;
+                console.log('[SupportWidget] Restored session:', sessionId);
+            }
+
+            if (history) {
+                var parsedHistory = JSON.parse(history);
+
+                // Restore messages to UI (only if recently saved - within 24 hours)
+                if (parsedHistory.length > 0) {
+                    var lastMessage = parsedHistory[parsedHistory.length - 1];
+                    var lastTime = new Date(lastMessage.timestamp);
+                    var now = new Date();
+                    var hoursSince = (now - lastTime) / (1000 * 60 * 60);
+
+                    if (hoursSince < 24) {
+                        console.log('[SupportWidget] Restoring chat history (' + parsedHistory.length + ' messages)');
+                        this.$welcome.hide();
+
+                        // Restore messages to UI WITHOUT adding to chatHistory (to avoid duplication)
+                        parsedHistory.forEach(function(msg) {
+                            // Don't restore system messages
+                            if (msg.role !== 'system') {
+                                this.addMessageToUI(msg.role, msg.content, msg.sources);
+                            }
+                        }.bind(this));
+
+                        // Now set chatHistory to the parsed history
+                        this.chatHistory = parsedHistory;
+
+                        // If restored history has user messages, mark session as active
+                        var hasUserMessages = parsedHistory.some(function(msg) {
+                            return msg.role === 'user';
+                        });
+                        if (hasUserMessages) {
+                            this.hasActiveSessionMessages = true;
+                        }
+                    } else {
+                        // Clear old session (older than 24 hours)
+                        console.log('[SupportWidget] Clearing old session (last activity: ' + hoursSince.toFixed(1) + ' hours ago)');
+                        this.clearSession();
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('[SupportWidget] Unable to restore session:', e);
+        }
+    },
+
+    /**
+     * Clear session data
+     */
+    clearSession: function() {
+        this.sessionId = null;
+        this.chatHistory = [];
+        this.isEscalated = false;
+        this.pendingAction = null;
+        this.awaitingDomain = false;
+        this.lastActionedDomain = null;
+        try {
+            localStorage.removeItem('support_widget_session');
+            localStorage.removeItem('support_widget_history');
+            sessionStorage.removeItem('support_widget_escalated');
+        } catch (e) {
+            console.warn('[SupportWidget] Unable to clear session:', e);
+        }
+    },
+
+    /**
+     * Clear chat history and start fresh (triggered by user clicking clear button)
+     */
+    clearHistory: function() {
+        console.log('[SupportWidget] Clearing chat history');
+
+        // Clear session data
+        this.clearSession();
+
+        // Clear all messages from UI
+        this.$messages.find('.support-widget-message').remove();
+
+        // Show welcome message again
+        this.$welcome.fadeIn();
+
+        // Reset stats
+        this.totalQueries = 0;
+        this.hasActiveSessionMessages = false;
+        this.pendingAction = null;
+        this.awaitingDomain = false;
+        this.lastActionedDomain = null;
+
+        // Clear input field
+        this.$input.val('');
+        this.$input.css('height', 'auto');
+        this.$sendBtn.prop('disabled', true);
+
+        console.log('[SupportWidget] Chat history cleared - starting fresh');
+        this.$input.focus();
+    },
+
+    /**
+     * Fetch login state from the server (used to authorize domain actions)
+     */
+    checkLoginState: function() {
+        var self = this;
+        $.get('/api/user/sessionInfo', function(data) {
+            self.isLoggedIn = data.loggedIn || false;
+        }).fail(function() {
+            self.isLoggedIn = false;
+        });
+    },
+
+    /**
+     * Handle an action_required response from the RAG server.
+     * Checks login state live at the moment the action is triggered.
+     */
+    handleActionRequired: function(action) {
+        var self = this;
+        $.get('/api/user/sessionInfo', function(data) {
+            self.isLoggedIn = data.loggedIn || false;
+
+            if (!self.isLoggedIn) {
+                self.showActionLoginPrompt();
+                return;
+            }
+
+            // 2FA is account-level — no domain needed
+            if (action.type === 'toggle_2fa') {
+                self.handleTwoFAAction(action);
+                return;
+            }
+
+            if (!action.domain) {
+                // If the user just acted on a domain this session, reuse it
+                if (self.lastActionedDomain) {
+                    self.showActionConfirmCard(action, self.lastActionedDomain);
+                    return;
+                }
+                // Otherwise wait for the user to provide a domain
+                self.pendingAction = action;
+                self.awaitingDomain = true;
+                // For how-to questions the RAG answer won't ask for a domain,
+                // so add an explicit offer
+                if (action.intent === 'howto') {
+                    self.addMessage('bot', 'Want me to handle this for you? Just reply with the domain name.');
+                }
+                return;
+            }
+
+            self.showActionConfirmCard(action, action.domain);
+        }).fail(function() {
+            self.isLoggedIn = false;
+            self.showActionLoginPrompt();
+        });
+    },
+
+    /**
+     * Show a confirmation card for a domain action
+     */
+    showActionConfirmCard: function(action, domain) {
+        var self = this;
+
+        var actionLabel = '';
+        if (action.type === 'toggle_autorenew') {
+            var statusWord = action.status === 'on' ? 'on' : 'off';
+            actionLabel = 'Turn <strong>' + statusWord + '</strong> auto-renew for <strong>' + $('<span>').text(domain).html() + '</strong>';
+        }
+
+        var $msg = $('<div>').addClass('support-widget-message bot action-confirm-card');
+        $msg.append($('<div>').addClass('support-widget-message-label').text('Support Assistant'));
+
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+        $bubble.html(
+            '<p>' + actionLabel + '</p>' +
+            '<div style="display:flex;gap:8px;margin-top:10px;">' +
+                '<button class="action-confirm-btn" style="flex:1;background:#28a745;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;">Confirm</button>' +
+                '<button class="action-cancel-btn" style="flex:1;background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;">Cancel</button>' +
+            '</div>'
+        );
+        $msg.append($bubble);
+        this.$messages.append($msg);
+        this.scrollToMessage($msg);
+
+        $msg.find('.action-confirm-btn').on('click', function() {
+            $msg.find('button').prop('disabled', true);
+            self.executeAction(action, domain, $msg);
+        });
+
+        $msg.find('.action-cancel-btn').on('click', function() {
+            $msg.find('button').prop('disabled', true);
+            // Re-enter awaiting domain so the user can specify a different domain
+            self.pendingAction = action;
+            self.awaitingDomain = true;
+            self.addMessage('bot', 'No problem. Which domain would you like instead?');
+        });
+    },
+
+    /**
+     * Execute a confirmed domain action
+     */
+    executeAction: function(action, domain, $confirmCard) {
+        var self = this;
+        $confirmCard.remove();
+        this.showTypingIndicator();
+
+        $.post('/tools/chatbot_execute_action', {
+            action_type: action.type,
+            domain: domain,
+            status: action.status
+        }, null, 'json')
+        .done(function(data) {
+            self.hideTypingIndicator();
+            if (data.success) {
+                var msg = data.message;
+                if (action.type === 'toggle_autorenew' && action.status === 'off') {
+                    msg += '\n\nPlease be aware that additional products attached to a domain such as email and web hosting will continue to renew independently from the domain renewal. Hosting products must be cancelled separately to prevent auto renewal.';
+                }
+                self.addMessage('bot', msg);
+                self.lastActionedDomain = domain;
+                if (action.type === 'toggle_autorenew') {
+                    self.syncAutoRenewDom(domain, action.status);
+                }
+                // Inject a clean action summary into the RAG session so follow-ups have full context
+                if (self.sessionId) {
+                    $.post('/tools/rag_add_context', {
+                        session_id: self.sessionId,
+                        message: 'Action completed: ' + data.message
+                    })
+                    .fail(function(xhr) { console.warn('[SupportWidget] rag_add_context failed:', xhr.status); });
+                }
+            } else {
+                self.addMessage('bot', 'Sorry, I wasn\'t able to complete that: ' + (data.error || 'Unknown error'));
+            }
+            self.pendingAction = null;
+            self.saveSession();
+            self.$input.focus();
+        })
+        .fail(function() {
+            self.hideTypingIndicator();
+            self.addMessage('bot', 'Sorry, something went wrong. Please try again or contact our support team at support@porkbun.com.');
+            self.pendingAction = null;
+            self.$input.focus();
+        });
+    },
+
+    /**
+     * Update auto-renew UI elements on the domains page (if present) after a widget action,
+     * mirroring what enableDisableAutoRenew() does without making another API call.
+     */
+    syncAutoRenewDom: function(domain, status) {
+        var isOn = (status === 'on');
+        var idDomain = domain.replace(/\./g, '_');
+
+        $('#utilitarianControlAutoRenew_' + idDomain).prop('checked', isOn);
+        $('#domainManagementDetailsContent_autoRenew_switch_' + idDomain).prop('checked', isOn);
+
+        if (isOn) {
+            $('#domainManagementIconButton_renewal_' + idDomain)
+                .removeClass('btn-default').addClass('btn-success-light');
+            $('.autoRenewLink[data-domain="' + domain + '"]').html('Disable Auto Renew');
+        } else {
+            $('#domainManagementIconButton_renewal_' + idDomain)
+                .removeClass('btn-success-light').addClass('btn-default');
+            $('.autoRenewLink[data-domain="' + domain + '"]').html('Enable Auto Renew');
+        }
+    },
+
+    /**
+     * Show a prompt when an action is requested but user is not logged in
+     */
+    showActionLoginPrompt: function() {
+        var $msg = $('<div>').addClass('support-widget-message bot');
+        $msg.append($('<div>').addClass('support-widget-message-label').text('Support Assistant'));
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+        $bubble.html('<p>You\'ll need to log in to make changes to your account.</p>');
+        $msg.append($bubble);
+        this.$messages.append($msg);
+        this.scrollToMessage($msg);
+    },
+
+    /**
+     * Handle a toggle_2fa action — fetch current status then route to enable or disable card
+     */
+    handleTwoFAAction: function(action, extraData) {
+        var self = this;
+        $.post('/tools/chatbot_2fa_status', $.extend({ status: 'check' }, extraData || {}), null, 'json')
+        .done(function(data) {
+            if (!data.success && data.verify) {
+                self.handleReauth(data.verify, data.webAuthnChallenge, function(authData) {
+                    self.handleTwoFAAction(action, authData);
+                });
+                return;
+            }
+            if (!data.success) {
+                self.addMessage('bot', data.error || 'Sorry, I couldn\'t check your 2FA status right now.');
+                return;
+            }
+
+            if (action.status === 'on' && data.enabled) {
+                self.addMessage('bot', '2FA is already enabled on your account.');
+                return;
+            }
+            if (action.status === 'off' && !data.enabled) {
+                self.addMessage('bot', '2FA is already disabled on your account.');
+                return;
+            }
+
+            if (action.status === 'on') {
+                self.showTwoFAEnableCard(data.initKey);
+            } else {
+                self.showTwoFADisableCard();
+            }
+        })
+        .fail(function() {
+            self.addMessage('bot', 'Sorry, I couldn\'t check your 2FA status right now.');
+        });
+    },
+
+    /**
+     * Handle re-authentication (password or security key) before a sensitive action.
+     * verifyType: 'password' or 'webauthn'
+     * challenge: webAuthn challenge string (only used for webauthn)
+     * retryCallback: called with {passwordVerify:...} or {webAuthnInfo:...} on success
+     */
+    handleReauth: function(verifyType, challenge, retryCallback) {
+        var self = this;
+        if (verifyType === 'webauthn') {
+            if (typeof webauthnAuthenticate === 'undefined') {
+                // Fallback if webauthn JS not on this page
+                self.showPasswordVerifyCard(function(password) {
+                    retryCallback({ passwordVerify: password });
+                });
+                return;
+            }
+            self.addMessage('bot', 'Please verify with your security key to continue.');
+            webauthnAuthenticate(challenge, function(ok, result) {
+                if (!ok) {
+                    if (result === 'abort') {
+                        self.addMessage('bot', 'Security key verification was cancelled.');
+                    } else {
+                        self.addMessage('bot', 'Security key verification failed. Please try again.');
+                    }
+                    self.$input.focus();
+                    return;
+                }
+                retryCallback({ webAuthnInfo: result });
+            });
+        } else {
+            self.showPasswordVerifyCard(function(password) {
+                retryCallback({ passwordVerify: password });
+            });
+        }
+    },
+
+    /**
+     * Show a password re-auth card and call onSubmit(password) on success.
+     */
+    showPasswordVerifyCard: function(onSubmit) {
+        var self = this;
+
+        var $msg = $('<div>').addClass('support-widget-message bot');
+        $msg.append($('<div>').addClass('support-widget-message-label').text('Support Assistant'));
+
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+        $bubble.html(
+            '<p>For your security, please enter your password to continue.</p>' +
+            '<input type="password" class="reauth-password-input" placeholder="Your password" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;box-sizing:border-box;">' +
+            '<p class="reauth-error" style="color:#dc3545;font-size:12px;margin:4px 0 0;display:none;"></p>' +
+            '<div style="display:flex;gap:8px;margin-top:10px;">' +
+                '<button class="reauth-submit" style="flex:1;background:#0077cc;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;">Continue</button>' +
+                '<button class="reauth-cancel" style="flex:1;background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;">Cancel</button>' +
+            '</div>'
+        );
+        $msg.append($bubble);
+        this.$messages.append($msg);
+        this.scrollToMessage($msg);
+
+        setTimeout(function() { $msg.find('.reauth-password-input').focus(); }, 200);
+
+        $msg.find('.reauth-password-input').on('keydown', function(e) {
+            if (e.key === 'Enter') $msg.find('.reauth-submit').trigger('click');
+        });
+
+        $msg.find('.reauth-submit').on('click', function() {
+            var password = $msg.find('.reauth-password-input').val();
+            if (!password) {
+                $msg.find('.reauth-password-input').css('border-color', '#dc3545').focus();
+                return;
+            }
+            $msg.find('button, .reauth-password-input').prop('disabled', true);
+            $msg.remove();
+            onSubmit(password);
+        });
+
+        $msg.find('.reauth-cancel').on('click', function() {
+            $msg.find('button').prop('disabled', true);
+            self.addMessage('bot', 'Action cancelled.');
+            self.$input.focus();
+        });
+    },
+
+    /**
+     * Show the 2FA setup card: QR code + 6-digit code input
+     */
+    showTwoFAEnableCard: function(initKey) {
+        var self = this;
+        var qrUrl = '/api/user/getTOTPQRCode/' + encodeURIComponent(initKey);
+
+        var $msg = $('<div>').addClass('support-widget-message bot');
+        $msg.append($('<div>').addClass('support-widget-message-label').text('Support Assistant'));
+
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+        $bubble.html(
+            '<p><strong>Enable Two-Factor Authentication</strong></p>' +
+            '<p>Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.), then enter the 6-digit code below.</p>' +
+            '<div style="text-align:center;margin:12px 0;">' +
+                '<img src="' + qrUrl + '" alt="2FA QR Code" style="width:160px;height:160px;border:1px solid #eee;border-radius:4px;">' +
+            '</div>' +
+            '<input type="text" class="twofa-code-input" placeholder="6-digit code" maxlength="6" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:18px;text-align:center;letter-spacing:6px;box-sizing:border-box;">' +
+            '<div style="display:flex;gap:8px;margin-top:10px;">' +
+                '<button class="twofa-enable-confirm" style="flex:1;background:#28a745;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;">Enable 2FA</button>' +
+                '<button class="twofa-enable-cancel" style="flex:1;background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;">Cancel</button>' +
+            '</div>'
+        );
+        $msg.append($bubble);
+        this.$messages.append($msg);
+        this.scrollToMessage($msg);
+
+        setTimeout(function() { $msg.find('.twofa-code-input').focus(); }, 200);
+
+        $msg.find('.twofa-code-input').on('keydown', function(e) {
+            if (e.key === 'Enter') $msg.find('.twofa-enable-confirm').trigger('click');
+        });
+
+        $msg.find('.twofa-enable-confirm').on('click', function() {
+            var code = $msg.find('.twofa-code-input').val().replace(/\s/g, '');
+            if (!/^\d{6}$/.test(code)) {
+                $msg.find('.twofa-code-input').css('border-color', '#dc3545').focus();
+                return;
+            }
+            $msg.find('button, .twofa-code-input').prop('disabled', true);
+            self.executeTwoFAEnable(code, $msg);
+        });
+
+        $msg.find('.twofa-enable-cancel').on('click', function() {
+            $msg.find('button, .twofa-code-input').prop('disabled', true);
+            self.addMessage('bot', 'No problem, 2FA setup has been cancelled.');
+            self.$input.focus();
+        });
+    },
+
+    /**
+     * Show the 2FA disable confirmation card
+     */
+    showTwoFADisableCard: function() {
+        var self = this;
+
+        var $msg = $('<div>').addClass('support-widget-message bot');
+        $msg.append($('<div>').addClass('support-widget-message-label').text('Support Assistant'));
+
+        var $bubble = $('<div>').addClass('support-widget-message-bubble');
+        $bubble.html(
+            '<p>Disable <strong>Two-Factor Authentication</strong> on your account?</p>' +
+            '<div style="display:flex;gap:8px;margin-top:10px;">' +
+                '<button class="twofa-disable-confirm" style="flex:1;background:#dc3545;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;">Disable 2FA</button>' +
+                '<button class="twofa-disable-cancel" style="flex:1;background:#6c757d;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px;">Cancel</button>' +
+            '</div>'
+        );
+        $msg.append($bubble);
+        this.$messages.append($msg);
+        this.scrollToMessage($msg);
+
+        $msg.find('.twofa-disable-confirm').on('click', function() {
+            $msg.find('button').prop('disabled', true);
+            self.callTwoFADisable(null, $msg);
+        });
+
+        $msg.find('.twofa-disable-cancel').on('click', function() {
+            $msg.find('button').prop('disabled', true);
+            self.addMessage('bot', 'No problem, 2FA remains enabled on your account.');
+            self.$input.focus();
+        });
+    },
+
+    /**
+     * Verify code and enable 2FA
+     */
+    executeTwoFAEnable: function(code, $card) {
+        var self = this;
+        $card.remove();
+        this.showTypingIndicator();
+
+        $.post('/tools/chatbot_2fa_enable', { code: code }, null, 'json')
+        .done(function(data) {
+            self.hideTypingIndicator();
+            if (data.success) {
+                self.addMessage('bot', '2FA has been enabled on your account. You\'ll need your authenticator app each time you log in.');
+                if (self.sessionId) {
+                    $.post('/tools/rag_add_context', { session_id: self.sessionId, message: 'Action completed: Two-factor authentication has been enabled.' });
+                }
+            } else {
+                self.addMessage('bot', data.error || 'Could not enable 2FA. Please check your code and try again.');
+                // Re-show the setup card so they can retry
+                self.handleTwoFAAction({ type: 'toggle_2fa', status: 'on' });
+                return;
+            }
+            self.$input.focus();
+        })
+        .fail(function() {
+            self.hideTypingIndicator();
+            self.addMessage('bot', 'Sorry, something went wrong. Please try again or visit your account settings.');
+            self.$input.focus();
+        });
+    },
+
+    /**
+     * Disable 2FA (handles re-auth if session expired)
+     * $card: the confirm card element to remove (null if retrying after re-auth)
+     * extraData: {passwordVerify:...} or {webAuthnInfo:...} if re-authing
+     */
+    callTwoFADisable: function(extraData, $card) {
+        var self = this;
+        if ($card) $card.remove();
+        this.showTypingIndicator();
+
+        $.post('/tools/chatbot_2fa_disable', $.extend({ action: 'disable' }, extraData || {}), null, 'json')
+        .done(function(data) {
+            self.hideTypingIndicator();
+            if (!data.success && data.verify) {
+                self.handleReauth(data.verify, data.webAuthnChallenge, function(authData) {
+                    self.callTwoFADisable(authData, null);
+                });
+                return;
+            }
+            if (data.success) {
+                self.addMessage('bot', data.message);
+                if (self.sessionId) {
+                    $.post('/tools/rag_add_context', { session_id: self.sessionId, message: 'Action completed: ' + data.message });
+                }
+            } else {
+                self.addMessage('bot', data.error || 'Could not disable 2FA. Please try again.');
+            }
+            self.$input.focus();
+        })
+        .fail(function() {
+            self.hideTypingIndicator();
+            self.addMessage('bot', 'Sorry, something went wrong. Please try again or visit your account settings.');
+            self.$input.focus();
+        });
+    },
+
+    /**
+     * Save widget state (open/closed)
+     */
+    saveState: function() {
+        try {
+            localStorage.setItem('support_widget_open', this.isOpen ? 'true' : 'false');
+        } catch (e) {
+            console.warn('[SupportWidget] Unable to save state:', e);
+        }
+    }
+};
+
+// Auto-initialize when DOM is ready
+$(document).ready(function() {
+    if (typeof SupportWidget !== 'undefined') {
+        SupportWidget.init();
+    }
+});
+
+// ============================================
+// Global API - Call from anywhere on the page
+// ============================================
+
+/**
+ * Toggle support widget (similar to Helpscout's beaconEvent)
+ * Usage: <a href="javascript:void(0);" onclick="toggleSupportWidget();">Chat Support</a>
+ */
+function toggleSupportWidget() {
+    if (typeof SupportWidget !== 'undefined' && SupportWidget.toggle) {
+        SupportWidget.toggle();
+    }
+}
+
+/**
+ * Open support widget
+ * Usage: <a href="javascript:void(0);" onclick="openSupportWidget();">Chat Support</a>
+ */
+function openSupportWidget() {
+    if (typeof SupportWidget !== 'undefined' && SupportWidget.open) {
+        SupportWidget.open();
+    }
+}
+
+/**
+ * Close support widget
+ */
+function closeSupportWidget() {
+    if (typeof SupportWidget !== 'undefined' && SupportWidget.close) {
+        SupportWidget.close();
+    }
+}
+
+/**
+ * Support widget event handler (Helpscout-style API)
+ * Usage: <a href="javascript:void(0);" onclick="supportWidgetEvent('toggle');">Chat Support</a>
+ *
+ * @param {string} action - 'toggle', 'open', 'close', or 'clear'
+ * @param {Event} event - Optional event object
+ */
+function supportWidgetEvent(action, event) {
+    if (event) {
+        event.preventDefault();
+    }
+
+    if (typeof SupportWidget === 'undefined') {
+        console.warn('[SupportWidget] Widget not initialized');
+        return;
+    }
+
+    switch(action) {
+        case 'toggle':
+            SupportWidget.toggle();
+            break;
+        case 'open':
+            SupportWidget.open();
+            break;
+        case 'close':
+            SupportWidget.close();
+            break;
+        case 'clear':
+            SupportWidget.clearHistory();
+            break;
+        default:
+            console.warn('[SupportWidget] Unknown action:', action);
+    }
+}
