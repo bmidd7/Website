@@ -19,14 +19,14 @@ import {
   idealGasLawP,
   idealGasLawT,
   idealGasLawV,
-} from "./gasFunctions.js";
-import { get4DigitCode, getGasInputs } from "./getGasInputs.js";
+} from "./gas-functions.js";
+import { get4DigitCode, getGasInputs } from "./get-gas-inputs.js";
 import {
   convertPressureToAtmosphere,
   convertTempToKelvin,
   convertVolumeToLiters,
-} from "./preConvertGases.js";
-import { defaultColors, InputArray } from "./localModules.js";
+} from "./pre-convert-gases.js";
+import { defaultColors, InputArray } from "./local-modules.js";
 
 const equationsContainer = document.getElementById("equations") as HTMLDivElement;
 const givenInputs = document.querySelectorAll("#givens input, #givens select");

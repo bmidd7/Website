@@ -28,6 +28,7 @@ const requiredApp = requireElement(app, "#pc-access-app");
 const mfaRequired = requiredApp.dataset.mfaRequired === "true";
 const bridgeStatusUrl = requiredApp.dataset.bridgeStatusUrl || "";
 const desktopUrl = requiredApp.dataset.desktopUrl || "";
+const launchUrl = requiredApp.dataset.launchUrl || "";
 const bridgeConfigured = requiredApp.dataset.bridgeConfigured === "true";
 const bridgeOnline = requiredApp.dataset.bridgeOnline === "true";
 const bridgeMessage = requiredApp.dataset.bridgeMessage || "";
@@ -42,7 +43,7 @@ if (!mfaRequired) {
   const requiredRemoteMessage = requireElement(remoteMessage, "#pc-remote-message");
   const requiredSetupPanel = requireElement(setupPanel, "#pc-setup-panel");
 
-  function setRemoteMessage(text: string, tone: "neutral" | "error" | "success" = "neutral") {
+  function setRemoteMessage(text: string, tone: "neutral" | "error" | "success" = "neutral"): void {
     requiredRemoteMessage.textContent = text;
     if (tone === "neutral") {
       requiredRemoteMessage.removeAttribute("data-tone");
@@ -52,7 +53,7 @@ if (!mfaRequired) {
     requiredRemoteMessage.dataset.tone = tone;
   }
 
-  function showSetupPanel() {
+  function showSetupPanel(): void {
     requiredRemotePanel.hidden = false;
     requiredSetupPanel.hidden = false;
     requiredRemoteFrame.hidden = true;
@@ -60,7 +61,7 @@ if (!mfaRequired) {
     requiredRemoteLink.removeAttribute("href");
   }
 
-  function showRemote() {
+  function showRemote(): void {
     requiredRemotePanel.hidden = false;
 
     if (!desktopUrl) {
@@ -71,7 +72,7 @@ if (!mfaRequired) {
 
     requiredSetupPanel.hidden = true;
     requiredRemoteFrame.hidden = false;
-    requiredRemoteLink.href = desktopUrl;
+    requiredRemoteLink.href = launchUrl || desktopUrl;
     requiredRemoteFrame.src = desktopUrl;
 
     if (guacConfigured && !guacValid) {
@@ -87,7 +88,7 @@ if (!mfaRequired) {
     setRemoteMessage("Desktop bridge status was not checked.");
   }
 
-  async function refreshBridgeStatus() {
+  async function refreshBridgeStatus(): Promise<void> {
     if (!bridgeStatusUrl) {
       return;
     }

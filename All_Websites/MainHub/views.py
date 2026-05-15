@@ -1,7 +1,4 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-
 # Create your views here.
 def DefaultHub(request):
     username = None
@@ -12,7 +9,7 @@ def DefaultHub(request):
         'username': username,
     }
 
-    return render(request, 'Hub/userHub/index.html', context)
+    return render(request, 'hub/user-hub/index.html', context)
 
 # @login_required
 # def AdminHub(request):

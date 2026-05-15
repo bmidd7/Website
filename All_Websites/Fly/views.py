@@ -4,11 +4,17 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
+from All_Websites.redirects import redirect_fly_api_to_subdomain
+
 from .main import run_simulation
 
 
 def flyDashboard(request):
-    return render(request, "Fly/index.html")
+    return render(request, "fly/index.html")
+
+
+def redirect_simulation_api(request):
+    return redirect_fly_api_to_subdomain(request)
 
 
 @csrf_exempt

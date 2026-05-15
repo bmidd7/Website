@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block app-specific-logo-in-sidebar %}
-<a href="/API/Camera/" id="this-app-button-link" class="sidebar-buttons hover-over-buttons no-underline">
+<a href="https://api.bmiddleton.dev/camera/" id="this-app-button-link" class="sidebar-buttons hover-over-buttons no-underline">
     <button id="this-app-button" class="sidebar-buttons hover-over-buttons">
         📸
     </button>
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <link rel="stylesheet" href="{% static 'css/API/Camera/Brad_Hall/BHallCam.css' %}">
+    <link rel="stylesheet" href="{% static 'css/api/camera/brad-hall/b-hall-cam.css' %}">
 
     <script type="module" src="{% static 'js/basehtml/sidebar/open.js' %}"></script>
     <script type="module" src="{% static 'js/basehtml/sidebar/resize.js' %}"></script>
@@ -47,7 +47,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.11.0/dist/tf-backend-wasm.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
-    <script type="module" src="{% static 'js/APIs/Camera/Hall_For_Brad/hallCamBrad.js' %}"></script>
-    <script type="module" src="{% static 'js/APIs/Camera/Hall_For_Brad/findModel.js' %}"></script>
+    <script type="module" src="{% static 'js/api/camera/hall-for-brad/hall-cam-brad.js' %}"></script>
+    <script type="module" src="{% static 'js/api/camera/hall-for-brad/find-model.js' %}"></script>
 {% endblock %}
 

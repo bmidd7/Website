@@ -19,7 +19,6 @@
 #givens {
   display: flex;
   flex-direction: column;
-  width: -moz-max-content;
   width: max-content;
 }
 
@@ -58,9 +57,7 @@
   font-size: 0.75rem;
   line-height: 1;
   cursor: help;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-          user-select: none;
+  user-select: none;
 }
 
 .givens-hint::after {
@@ -93,8 +90,7 @@
   display: grid;
   grid-template-columns: minmax(120px, 1fr) minmax(160px, 1.2fr) minmax(140px, 1fr);
   grid-auto-rows: minmax(36px, auto);
-  -moz-column-gap: 12px;
-       column-gap: 12px;
+  column-gap: 12px;
   row-gap: 10px;
   align-items: center;
 }
@@ -109,4 +105,4 @@
 .givens-grid input,
 .givens-grid select {
   width: 100%;
-}/*# sourceMappingURL=Chem.css.map */
+}

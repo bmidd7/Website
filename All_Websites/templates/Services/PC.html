@@ -6,7 +6,7 @@ Away PC
 {% endblock %}
 
 {% block extra-css %}
-<link rel="stylesheet" href="{% static 'css/Services/PC.css' %}?v=20260429a">
+<link rel="stylesheet" href="{% static 'css/services/pc.css' %}?v=20260514a">
 {% endblock %}
 
 {% block app-specific-logo-in-sidebar %}
@@ -25,6 +25,7 @@ Away PC
     class="pc-shell"
     data-bridge-status-url="{% url 'Services_PC_bridge_status' %}"
     data-desktop-url="{{ pc_desktop_url }}"
+    data-launch-url="{{ pc_launch_url }}"
     data-mfa-required="{{ pc_mfa_required|yesno:'true,false' }}"
     data-bridge-configured="{{ pc_bridge_status.configured|yesno:'true,false' }}"
     data-bridge-online="{{ pc_bridge_status.online|yesno:'true,false' }}"
@@ -108,7 +109,7 @@ Away PC
                             <p class="pc-kicker">Connected</p>
                             <h2 id="pc-remote-title">{{ pc_remote_name }}</h2>
                         </div>
-                        <a id="pc-open-remote" class="pc-primary-link" href="{{ pc_desktop_url|default:'#' }}" target="_blank" rel="noreferrer noopener">
+                        <a id="pc-open-remote" class="pc-primary-link" href="{{ pc_launch_url|default:'#' }}" target="_blank" rel="noreferrer noopener">
                             Open
                         </a>
                     </div>
@@ -136,5 +137,5 @@ Away PC
 {% endblock %}
 
 {% block extra_js %}
-<script type="module" src="{% static 'js/Services/PC.js' %}?v=20260507a"></script>
+<script type="module" src="{% static 'js/services/pc.js' %}?v=20260514a"></script>
 {% endblock %}

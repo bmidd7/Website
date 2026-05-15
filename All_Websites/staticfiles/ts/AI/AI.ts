@@ -1,3 +1,5 @@
+export {};
+
 type MessageRole = "assistant" | "user";
 
 interface StoredMessage {
@@ -33,6 +35,15 @@ const FALLBACK_MESSAGE: StoredMessage = {
   role: "assistant",
   text: "Ask me anything once LM Studio is running with a model loaded.",
 };
+
+function getApiOrigin(): string {
+  const { protocol, hostname, port } = window.location;
+  if (hostname === "bmiddleton.dev" || hostname === "www.bmiddleton.dev" || hostname === "remote.bmiddleton.dev") {
+    return `${protocol}//api.bmiddleton.dev`;
+  }
+
+  return port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
+}
 
 function requireElement<T>(element: T | null, message: string): T {
   if (!element) {
@@ -498,7 +509,7 @@ async function submitMessage() {
   });
 
   try {
-    const response = await fetch("/AI/chat/", {
+    const response = await fetch(`${getApiOrigin()}/ai/chat/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

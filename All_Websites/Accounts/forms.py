@@ -46,7 +46,7 @@ class UserComputerSettingsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["guac_username"].label = "Guacamole username"
         self.fields["guac_uses_account_password"].label = "Use my site password for Guacamole"
-        self.fields["desktop_url"].help_text = "Use a public or VPN-reachable URL if you will connect from another device. Localhost only works on the same machine."
+        self.fields["desktop_url"].help_text = "Defaults to the remote Guacamole URL. Use a public or VPN-reachable URL if you will connect from another device."
         if user:
             self.fields["guac_username"].help_text = f"Leave blank to use your account username: {user.username}"
 

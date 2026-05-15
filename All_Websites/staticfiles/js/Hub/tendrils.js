@@ -1,6 +1,6 @@
-import "./centerOrb.js";
-import { HUB_CONFIG, PROJECTS } from "./tendrilsConfig.js";
-import { createProjectNodes, positionNodes, setMaxDragDistances, updateNodeMotion, } from "./tendrilsNodes.js";
+import "./center-orb.js";
+import { HUB_CONFIG, PROJECTS } from "./tendrils-config.js";
+import { createProjectNodes, positionNodes, setMaxDragDistances, updateNodeMotion, } from "./tendrils-nodes.js";
 const canvas = document.getElementById('canvas');
 const canvasContext = canvas.getContext('2d');
 export const orbEl = document.getElementById('orb');

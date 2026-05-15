@@ -1,0 +1,17 @@
+{
+  "name": "all-websites",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:ts && npm run build:scss",
+    "build:ts": "tsc -p tsconfig.json",
+    "build:scss": "sass static/scss:static/css Accounts/static/accounts/css/login/login.scss:Accounts/static/accounts/css/login/login.css Accounts/static/accounts/css/logout/logout.scss:Accounts/static/accounts/css/logout/logout.css Accounts/static/accounts/css/signup/signup.scss:Accounts/static/accounts/css/signup/signup.css --no-source-map",
+    "watch": "concurrently \"npm:watch:ts\" \"npm:watch:scss\"",
+    "watch:ts": "tsc -p tsconfig.json --watch",
+    "watch:scss": "sass --watch static/scss:static/css Accounts/static/accounts/css/login/login.scss:Accounts/static/accounts/css/login/login.css Accounts/static/accounts/css/logout/logout.scss:Accounts/static/accounts/css/logout/logout.css Accounts/static/accounts/css/signup/signup.scss:Accounts/static/accounts/css/signup/signup.css --no-source-map"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "sass": "^1.93.2",
+    "typescript": "^5.8.3"
+  }
+}

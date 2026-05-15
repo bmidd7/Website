@@ -44,7 +44,7 @@ class SimulationConfig:
         payload = payload or {}
         config = cls(
             duration_s=float(payload.get("duration_s", DEFAULT_DURATION_S)),
-            fps=float(payload.get("fps", DEFAULT_FPS)),
+            fps=int(payload.get("fps", DEFAULT_FPS)),
             quality=str(payload.get("quality", DEFAULT_QUALITY)).lower(),
             world=str(payload.get("world", DEFAULT_WORLD)),
             behavior=str(payload.get("behavior", DEFAULT_BEHAVIOR)),

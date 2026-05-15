@@ -15,16 +15,30 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path, re_path
+
+from .redirects import (
+    redirect_fly_api_to_subdomain,
+    redirect_to_api_subdomain,
+    redirect_to_local_kebab,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('MainHub.urls')),
     path('accounts/', include('Accounts.urls')),
     path('accounts/', include('allauth.urls')),
-    path('API/', include('APIs.urls')),
-    path('School/', include('School.urls')),
-    path('AI/', include('AI.urls')),
-    path('Services/', include('Services.urls')),
-    path('Fly/', include('Fly.urls')),
+    re_path(r"^API/?(?P<remaining>.*)$", redirect_to_api_subdomain),
+    re_path(r"^api/?(?P<remaining>.*)$", redirect_to_api_subdomain),
+    re_path(r"^School/?(?P<remaining>.*)$", lambda request, remaining="": redirect_to_local_kebab(request, "school", remaining)),
+    re_path(r"^AI/chat/?$", lambda request: redirect_to_api_subdomain(request, "ai/chat")),
+    re_path(r"^AI/model/?$", lambda request: redirect_to_api_subdomain(request, "ai/model")),
+    re_path(r"^AI/?(?P<remaining>.*)$", lambda request, remaining="": redirect_to_local_kebab(request, "ai", remaining)),
+    re_path(r"^Services/?(?P<remaining>.*)$", lambda request, remaining="": redirect_to_local_kebab(request, "services", remaining)),
+    re_path(r"^Fly/api/simulate/?$", redirect_fly_api_to_subdomain),
+    re_path(r"^Fly/?(?P<remaining>.*)$", lambda request, remaining="": redirect_to_local_kebab(request, "fly", remaining)),
+    path('school/', include('School.urls')),
+    path('ai/', include('AI.urls')),
+    path('services/', include('Services.urls')),
+    path('fly/', include('Fly.urls')),
 ]

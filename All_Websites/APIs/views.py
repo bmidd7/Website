@@ -8,16 +8,16 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def Control(request):
-    return render(request, 'API/TEMP_index.html')
+    return render(request, 'api/temp-index.html')
 
 
 @login_required
 def camera(request):
-    return render(request, 'API/camera.html')
+    return render(request, 'api/camera.html')
 
 
 def control_redirect(request):
-    return redirect('/API/Control')
+    return redirect('/control/')
 
 
 def ping(request):

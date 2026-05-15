@@ -14,6 +14,7 @@ const requiredApp = requireElement(app, "#pc-access-app");
 const mfaRequired = requiredApp.dataset.mfaRequired === "true";
 const bridgeStatusUrl = requiredApp.dataset.bridgeStatusUrl || "";
 const desktopUrl = requiredApp.dataset.desktopUrl || "";
+const launchUrl = requiredApp.dataset.launchUrl || "";
 const bridgeConfigured = requiredApp.dataset.bridgeConfigured === "true";
 const bridgeOnline = requiredApp.dataset.bridgeOnline === "true";
 const bridgeMessage = requiredApp.dataset.bridgeMessage || "";
@@ -50,7 +51,7 @@ if (!mfaRequired) {
         }
         requiredSetupPanel.hidden = true;
         requiredRemoteFrame.hidden = false;
-        requiredRemoteLink.href = desktopUrl;
+        requiredRemoteLink.href = launchUrl || desktopUrl;
         requiredRemoteFrame.src = desktopUrl;
         if (guacConfigured && !guacValid) {
             setRemoteMessage(guacMessage || "Saved Guacamole credentials were rejected.", "error");
@@ -88,4 +89,4 @@ if (!mfaRequired) {
     }, 15000);
 }
 export {};
-//# sourceMappingURL=PC.js.map
+//# sourceMappingURL=pc.js.map

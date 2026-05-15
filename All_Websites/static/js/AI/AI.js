@@ -8,6 +8,13 @@ const FALLBACK_MESSAGE = {
     role: "assistant",
     text: "Ask me anything once LM Studio is running with a model loaded.",
 };
+function getApiOrigin() {
+    const { protocol, hostname, port } = window.location;
+    if (hostname === "bmiddleton.dev" || hostname === "www.bmiddleton.dev" || hostname === "remote.bmiddleton.dev") {
+        return `${protocol}//api.bmiddleton.dev`;
+    }
+    return port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
+}
 function requireElement(element, message) {
     if (!element) {
         throw new Error(message);
@@ -373,7 +380,7 @@ async function submitMessage() {
         editable: false,
     });
     try {
-        const response = await fetch("/AI/chat/", {
+        const response = await fetch(`${getApiOrigin()}/ai/chat/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -438,4 +445,5 @@ requiredClearHistoryButton.addEventListener("click", () => {
 restoreStoredMessages();
 resizeChatInput();
 updateEditButtonsDisabledState();
-//# sourceMappingURL=AI.js.map
+export {};
+//# sourceMappingURL=ai.js.map

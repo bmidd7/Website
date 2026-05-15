@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .ai import LMStudioError, chat, get_active_model
 from django.shortcuts import render
+from All_Websites.redirects import redirect_to_api_subdomain
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant inside a local website chat powered by LM Studio. "
@@ -82,10 +83,10 @@ def _chat_response(request):
 @csrf_exempt
 def DefaultAI(request):
     if request.method == "GET":
-        return render(request, "AI/index.html")
+        return render(request, "ai/index.html")
 
     if request.method == "POST":
-        return _chat_response(request)
+        return redirect_to_api_subdomain(request, "ai/chat")
 
     return JsonResponse({"error": "GET or POST only"}, status=405)
 

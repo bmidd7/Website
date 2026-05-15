@@ -36,13 +36,18 @@ SECRET_KEY = 'django-insecure-o=b@1#q+t_fhrhuv0*1*5=*i2!2g&m_o*mr+_ch%3c^uuoa2$@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*', "bmiddleton.dev", "www.bmiddleton.dev", "remote.bmiddleton.dev"]
+SITE_SCHEME = os.environ.get("SITE_SCHEME", "https")
+PRIMARY_SITE_HOST = os.environ.get("PRIMARY_SITE_HOST", "bmiddleton.dev")
+API_SITE_HOST = os.environ.get("API_SITE_HOST", "api.bmiddleton.dev")
+REMOTE_SITE_HOST = os.environ.get("REMOTE_SITE_HOST", "remote.bmiddleton.dev")
+
+ALLOWED_HOSTS = ['*', PRIMARY_SITE_HOST, f"www.{PRIMARY_SITE_HOST}", API_SITE_HOST, REMOTE_SITE_HOST]
 
 CSRF_TRUSTED_ORIGINS = [
    # 'http://localhost:8000', 'https://localhost:8000',
     'https://isreal-brainy-irreclaimably.ngrok-free.dev/',
-    "https://bmiddleton.dev", "https://www.bmiddleton.dev",
-    "https://remote.bmiddleton.dev"
+    f"{SITE_SCHEME}://{PRIMARY_SITE_HOST}", f"{SITE_SCHEME}://www.{PRIMARY_SITE_HOST}",
+    f"{SITE_SCHEME}://{API_SITE_HOST}", f"{SITE_SCHEME}://{REMOTE_SITE_HOST}",
     ]
 
 '''CSRF_COOKIE_SECURE = True
@@ -88,6 +93,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'All_Websites.middleware.SubdomainURLConfMiddleware',
     'django.middleware.common.CommonMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -183,6 +189,8 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+SESSION_COOKIE_DOMAIN = os.environ.get("SESSION_COOKIE_DOMAIN") or None
+CSRF_COOKIE_DOMAIN = os.environ.get("CSRF_COOKIE_DOMAIN") or SESSION_COOKIE_DOMAIN
 ACCOUNT_REAUTHENTICATION_TIMEOUT = 60 * 90
 
 MFA_SUPPORTED_TYPES = ["recovery_codes", "totp", "webauthn"]

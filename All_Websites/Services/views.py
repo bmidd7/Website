@@ -6,8 +6,8 @@ from urllib.parse import urlencode
 from allauth.account.authentication import get_authentication_records
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from Accounts.models import UserComputer
@@ -32,8 +32,8 @@ def _pc_for_request(request) -> UserComputer | None:
 
 
 def _pc_desktop_url() -> str:
-    # Try environment variables first, then default to the remote subdomain
-    default_url = "https://remote.bmiddleton.dev"
+    # Try environment variables first, then default to Guacamole on the remote subdomain.
+    default_url = f"{getattr(settings, 'SITE_SCHEME', 'https')}://{getattr(settings, 'REMOTE_SITE_HOST', 'remote.bmiddleton.dev')}/guacamole/"
     return os.environ.get(PC_DESKTOP_URL_ENV) or os.environ.get(PC_REMOTE_URL_ENV, default_url)
 
 
@@ -126,7 +126,7 @@ def _pc_mfa_reauth_url(request) -> str:
 
 
 def Dashboard(request):
-    return render(request, "Services/Dashboard.html")
+    return render(request, "services/dashboard.html")
 
 
 @login_required
@@ -134,10 +134,11 @@ def PC(request):
     desktop_url = _pc_desktop_url_for_request(request)
     return render(
         request,
-        "Services/PC.html",
+        "services/pc.html",
         {
             "pc_remote_name": _pc_remote_name_for_request(request),
             "pc_desktop_url": desktop_url,
+            "pc_launch_url": reverse("Services_PC_open"),
             "pc_desktop_configured": bool(desktop_url),
             "pc_mfa_required": _pc_requires_recent_mfa(request),
             "pc_mfa_url": _pc_mfa_reauth_url(request),
@@ -147,6 +148,40 @@ def PC(request):
             "pc_bridge_status": _pc_bridge_status(request),
         },
     )
+
+
+@login_required
+def pcOpen(request):
+    if _pc_requires_recent_mfa(request):
+        return redirect(_pc_mfa_reauth_url(request))
+
+    guac_status = _pc_guacamole_status(request)
+    if guac_status and guac_status.get("configured") and not guac_status.get("valid"):
+        return redirect("Services_PC")
+
+    desktop_url = _pc_desktop_url_for_request(request)
+    if not desktop_url:
+        return redirect("Services_PC")
+
+    return redirect(desktop_url)
+
+
+def pcAuthForward(request):
+    user = getattr(request, "user", None)
+    if not user or not user.is_authenticated:
+        return JsonResponse({"error": "Authentication required."}, status=401)
+
+    if _pc_requires_recent_mfa(request):
+        return JsonResponse({"error": "Recent MFA is required."}, status=403)
+
+    guac_status = _pc_guacamole_status(request)
+    if guac_status and guac_status.get("configured") and not guac_status.get("valid"):
+        return JsonResponse(
+            {"error": guac_status.get("message", "Guacamole credentials are invalid.")},
+            status=403,
+        )
+
+    return HttpResponse(status=204)
 
 
 @login_required

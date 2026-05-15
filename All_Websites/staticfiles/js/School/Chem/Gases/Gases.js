@@ -1,7 +1,7 @@
-import { avogadrosLawN, avogadrosLawV, boylesLawP, boylesLawV, charlesLawT, charlesLawV, gayLussacsLawP, gayLussacsLawT, idealGasLawN, idealGasLawP, idealGasLawT, idealGasLawV, } from "./gasFunctions.js";
-import { get4DigitCode, getGasInputs } from "./getGasInputs.js";
-import { convertPressureToAtmosphere, convertTempToKelvin, convertVolumeToLiters, } from "./preConvertGases.js";
-import { defaultColors } from "./localModules.js";
+import { avogadrosLawN, avogadrosLawV, boylesLawP, boylesLawV, charlesLawT, charlesLawV, gayLussacsLawP, gayLussacsLawT, idealGasLawN, idealGasLawP, idealGasLawT, idealGasLawV, } from "./gas-functions.js";
+import { get4DigitCode, getGasInputs } from "./get-gas-inputs.js";
+import { convertPressureToAtmosphere, convertTempToKelvin, convertVolumeToLiters, } from "./pre-convert-gases.js";
+import { defaultColors } from "./local-modules.js";
 const equationsContainer = document.getElementById("equations");
 const givenInputs = document.querySelectorAll("#givens input, #givens select");
 function formatNumber(value) {
@@ -262,4 +262,4 @@ givenInputs.forEach((input) => {
     input.addEventListener("change", renderEquations);
 });
 renderEquations();
-//# sourceMappingURL=Gases.js.map
+//# sourceMappingURL=gases.js.map

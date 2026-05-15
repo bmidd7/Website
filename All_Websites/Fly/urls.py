@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('', views.flyDashboard, name="flyDashboard"),
-    path('api/simulate/', views.run_simulation_api, name="flySimulateApi"),
+    path('api/simulate/', views.redirect_simulation_api, name="flySimulateApi"),
 ]
