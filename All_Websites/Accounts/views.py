@@ -1,5 +1,5 @@
-from .forms import UserComputerSettingsForm
-from .models import UserComputer
+from .forms import UserComputerSettingsForm, MFASettingsForm
+from .models import UserComputer, MFA
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
@@ -38,7 +38,10 @@ def TESTEMAIL(request):
 @login_required
 def account_security_view(request):
     computer, _ = UserComputer.objects.get_or_create(user=request.user)
+    mfa, _ = MFA.objects.get_or_create(user=request.user)
+    
     computer_form = UserComputerSettingsForm(instance=computer, prefix="computer", user=request.user)
+    mfa_form = MFASettingsForm(instance=mfa, prefix="mfa")
     guac_status = verify_guac_login(computer) if computer.desktop_url and computer.has_guac_password() else None
 
     if request.method == "POST":
@@ -54,12 +57,23 @@ def account_security_view(request):
                 computer_form.save()
                 messages.success(request, "PC connection settings saved.")
                 return redirect("account_settings")
+        elif action == "save_mfa":
+            mfa_form = MFASettingsForm(
+                request.POST,
+                instance=mfa,
+                prefix="mfa",
+            )
+            if mfa_form.is_valid():
+                mfa_form.save()
+                messages.success(request, "MFA frequency preference saved.")
+                return redirect("account_settings")
 
     return render(
         request,
         "accounts/settings.html",
         {
             "computer_form": computer_form,
+            "mfa_form": mfa_form,
             "computer": computer,
             "guac_status": guac_status,
         },

@@ -69,6 +69,7 @@ class MFA(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     tempOTP_secret = models.CharField(max_length=32, blank=True, null=True)
     is_tempOTP_enabled = models.BooleanField(default=False)
+    mfa_frequency_minutes = models.PositiveIntegerField(default=90, help_text="How often MFA is required for PC access (in minutes). Default is 90 minutes.")
     
     def __str__(self):
         return self.user.username

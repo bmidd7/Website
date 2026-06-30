@@ -38,5 +38,17 @@
                 <a href="{% url 'Services_PC' %}">Open your PC page</a>
             </p>
         </section>
+
+        <section>
+            <h2>PC Access Security</h2>
+            <p>
+                Configure how often you need to re-authenticate with Multi-Factor Authentication (MFA) when accessing your PC through Guacamole.
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                {{ mfa_form.as_p }}
+                <button type="submit" name="action" value="save_mfa">Save MFA Settings</button>
+            </form>
+        </section>
     </body>
 </html>

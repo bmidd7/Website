@@ -2,6 +2,7 @@
 title My Django + Caddy + Guacamole Server
 
 set PROJECT_DIR=M:\C VSCode\.vscode\Website\All_Websites
+set ODYESSEUS_DIR=M:\C VSCode\odysseus
 set GUACAMOLE_DIR=%PROJECT_DIR%\Services\guacamole-stack
 set WSGI_MODULE=All_Websites.wsgi:application
 set PYTHON=python
@@ -38,6 +39,11 @@ echo Starting Caddy...
 
 start "Caddy" /B caddy.exe run
 
+@REM echo Starting Odysseus...
+
+@REM cd /d "%ODYESSEUS_DIR%"
+
+@REM start "Odysseus" /B  ./launch-windows.ps1
 
 echo.
 echo ========================================

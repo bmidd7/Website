@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import math
 import random
+import psutil
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -121,7 +122,29 @@ def _behavior_velocity(behavior: str, t: float, rng: random.Random) -> tuple[flo
     return 0.95 + 0.25 * math.sin(t * 1.1), rng.uniform(-0.25, 0.25)
 
 
-def _simulate_frames(config: SimulationConfig, quality: Mapping[str, Any]) -> list[dict[str, Any]]:
+def _track_resources() -> dict[str, Any]:
+    """Capture current system resource usage."""
+    resources = {
+        "cpu_percent": psutil.cpu_percent(interval=0.1),
+        "ram_percent": psutil.virtual_memory().percent,
+        "ram_gb": psutil.virtual_memory().used / (1024 ** 3),
+    }
+    
+    # Try to get GPU metrics (optional - won't fail if unavailable)
+    try:
+        import GPUtil  # type: ignore
+        gpus = GPUtil.getGPUs()
+        if gpus:
+            resources["gpu_percent"] = gpus[0].load * 100
+            resources["vram_gb"] = gpus[0].memoryUsed / 1024
+    except (ImportError, Exception):
+        resources["gpu_percent"] = None
+        resources["vram_gb"] = None
+    
+    return resources
+
+
+def _simulate_frames(config: SimulationConfig, quality: Mapping[str, Any]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     rng = random.Random(config.seed)
     sim_hz = int(quality["sim_hz"])
     total_steps = max(1, int(config.duration_s * sim_hz))
@@ -133,6 +156,12 @@ def _simulate_frames(config: SimulationConfig, quality: Mapping[str, Any]) -> li
     heading = 0.0
     half_arena = config.arena_size / 2.0
     frames: list[dict[str, Any]] = []
+    
+    # Track resources during simulation
+    cpu_samples: list[float] = []
+    gpu_samples: list[float | None] = []
+    ram_samples: list[float] = []
+    vram_samples: list[float | None] = []
 
     for step in range(total_steps):
         t = step / sim_hz
@@ -165,15 +194,41 @@ def _simulate_frames(config: SimulationConfig, quality: Mapping[str, Any]) -> li
                     "speed": round(speed, 4),
                 }
             )
+        
+        # Sample resources periodically
+        if step % max(1, int(total_steps / 20)) == 0:
+            resources = _track_resources()
+            cpu_samples.append(resources["cpu_percent"])
+            gpu_samples.append(resources["gpu_percent"])
+            ram_samples.append(resources["ram_gb"])
+            vram_samples.append(resources["vram_gb"])
 
-    return frames
+    # Compute resource statistics
+    def stats(samples: list[float | None]) -> dict[str, float | None]:
+        valid = [s for s in samples if s is not None]
+        if not valid:
+            return {"max": None, "avg": None, "min": None}
+        return {
+            "max": max(valid),
+            "avg": sum(valid) / len(valid),
+            "min": min(valid),
+        }
+
+    resource_stats = {
+        "cpu": stats(cpu_samples),
+        "gpu": stats(gpu_samples),
+        "ram_gb": stats(ram_samples),
+        "vram_gb": stats(vram_samples),
+    }
+
+    return frames, resource_stats
 
 
 def run_simulation(payload: Mapping[str, Any] | None = None) -> dict[str, Any]:
     config = SimulationConfig.from_input(payload)
     quality = _quality_settings(config.quality)
     connectome = _load_connectome_summary(config.data_path)
-    frames = _simulate_frames(config, quality)
+    frames, resource_stats = _simulate_frames(config, quality)
 
     return {
         "config": asdict(config),
@@ -185,6 +240,12 @@ def run_simulation(payload: Mapping[str, Any] | None = None) -> dict[str, Any]:
             "fps": config.fps,
             "world": config.world,
             "behavior": config.behavior,
+        },
+        "resources": {
+            "cpu_percent": resource_stats["cpu"],
+            "gpu_percent": resource_stats["gpu"],
+            "ram_gb": resource_stats["ram_gb"],
+            "vram_gb": resource_stats["vram_gb"],
         },
         "frames": frames,
     }

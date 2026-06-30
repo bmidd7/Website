@@ -24,8 +24,12 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
-
+#SECURE_SSL_REDIRECT = True #Caddy does it
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -49,6 +53,8 @@ CSRF_TRUSTED_ORIGINS = [
     f"{SITE_SCHEME}://{PRIMARY_SITE_HOST}", f"{SITE_SCHEME}://www.{PRIMARY_SITE_HOST}",
     f"{SITE_SCHEME}://{API_SITE_HOST}", f"{SITE_SCHEME}://{REMOTE_SITE_HOST}",
     ]
+
+FORMS_URLFIELD_ASSUME_HTTPS = True
 
 '''CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -87,6 +93,7 @@ INSTALLED_APPS = [
     'School',
     'AI',
     'Services',
+    'Fly',
 ]
 
 MIDDLEWARE = [
@@ -96,6 +103,13 @@ MIDDLEWARE = [
     'All_Websites.middleware.SubdomainURLConfMiddleware',
     'django.middleware.common.CommonMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
+
+
+
+
+
+
+
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -189,7 +203,10 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-SESSION_COOKIE_DOMAIN = os.environ.get("SESSION_COOKIE_DOMAIN") or None
+
+SESSION_COOKIE_DOMAIN = os.environ.get("SESSION_COOKIE_DOMAIN")
+if not SESSION_COOKIE_DOMAIN and REMOTE_SITE_HOST.endswith(f".{PRIMARY_SITE_HOST}"):
+    SESSION_COOKIE_DOMAIN = f".{PRIMARY_SITE_HOST}"
 CSRF_COOKIE_DOMAIN = os.environ.get("CSRF_COOKIE_DOMAIN") or SESSION_COOKIE_DOMAIN
 ACCOUNT_REAUTHENTICATION_TIMEOUT = 60 * 90
 
@@ -216,8 +233,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
@@ -243,3 +258,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+
+TMDB_API_KEY = os.environ.get("TMDB_API_KEY")
+MEDIA_API_KEY = os.environ.get("MEDIA_API_KEY")

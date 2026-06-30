@@ -16,18 +16,18 @@ class RawData(models.Model):
     max_saved_frames=models.IntegerField(default=500)
     #resource usage
     #CPU
-    # max
-    # avg
-    # min
+    cpu_max_percent=models.FloatField(null=True, blank=True)
+    cpu_avg_percent=models.FloatField(null=True, blank=True)
+    cpu_min_percent=models.FloatField(null=True, blank=True)
     #GPU
-    # max
-    # avg
-    # min
+    gpu_max_percent=models.FloatField(null=True, blank=True)
+    gpu_avg_percent=models.FloatField(null=True, blank=True)
+    gpu_min_percent=models.FloatField(null=True, blank=True)
     #VRAM
-    # max
-    # avg
-    # min
+    vram_max_gb=models.FloatField(null=True, blank=True)
+    vram_avg_gb=models.FloatField(null=True, blank=True)
+    vram_min_gb=models.FloatField(null=True, blank=True)
     #RAM
-    # max
-    # avg
-    # min
+    ram_max_gb=models.FloatField(null=True, blank=True)
+    ram_avg_gb=models.FloatField(null=True, blank=True)
+    ram_min_gb=models.FloatField(null=True, blank=True)

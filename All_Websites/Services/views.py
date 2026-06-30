@@ -10,7 +10,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from Accounts.models import UserComputer
+from Accounts.models import UserComputer, MFA
 from Accounts.services import verify_guac_login
 
 PC_REMOTE_URL_ENV = "PC_REMOTE_URL"
@@ -104,8 +104,20 @@ def _pc_guacamole_status(request) -> dict[str, object] | None:
     return verify_guac_login(computer)
 
 
+def _get_mfa_max_age_seconds(request) -> int:
+    """Get MFA max age in seconds from user preferences or settings."""
+    user = getattr(request, "user", None)
+    if user and user.is_authenticated:
+        try:
+            mfa_settings = MFA.objects.get(user=user)
+            return mfa_settings.mfa_frequency_minutes * 60
+        except MFA.DoesNotExist:
+            pass
+    return getattr(settings, "PC_MFA_MAX_AGE_SECONDS", 60 * 90)
+
+
 def _recent_mfa_record(request) -> dict | None:
-    max_age = getattr(settings, "PC_MFA_MAX_AGE_SECONDS", 60 * 90)
+    max_age = _get_mfa_max_age_seconds(request)
     now = time.time()
     for record in reversed(get_authentication_records(request)):
         if record.get("method") != "mfa":
@@ -132,6 +144,7 @@ def Dashboard(request):
 @login_required
 def PC(request):
     desktop_url = _pc_desktop_url_for_request(request)
+    mfa_max_age_minutes = int(_get_mfa_max_age_seconds(request) / 60)
     return render(
         request,
         "services/pc.html",
@@ -142,7 +155,7 @@ def PC(request):
             "pc_desktop_configured": bool(desktop_url),
             "pc_mfa_required": _pc_requires_recent_mfa(request),
             "pc_mfa_url": _pc_mfa_reauth_url(request),
-            "pc_mfa_max_age_minutes": int(getattr(settings, "PC_MFA_MAX_AGE_SECONDS", 5400) / 60),
+            "pc_mfa_max_age_minutes": mfa_max_age_minutes,
             "pc_recent_mfa_record": _recent_mfa_record(request),
             "pc_guacamole_status": _pc_guacamole_status(request),
             "pc_bridge_status": _pc_bridge_status(request),
@@ -157,13 +170,23 @@ def pcOpen(request):
 
     guac_status = _pc_guacamole_status(request)
     if guac_status and guac_status.get("configured") and not guac_status.get("valid"):
-        return redirect("Services_PC")
+        # Force MFA re-authentication if guacamole credentials failed
+        response = redirect(_pc_mfa_reauth_url(request))
+        # Clear session to remove any cached authentication state
+        response.delete_cookie("sessionid", path="/", domain=getattr(settings, "SESSION_COOKIE_DOMAIN"))
+        response.delete_cookie("csrftoken", path="/", domain=getattr(settings, "CSRF_COOKIE_DOMAIN"))
+        return response
 
     desktop_url = _pc_desktop_url_for_request(request)
     if not desktop_url:
         return redirect("Services_PC")
 
-    return redirect(desktop_url)
+    response = redirect(desktop_url)
+    # Add cache control headers to prevent stale authentication
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+    return response
 
 
 def pcAuthForward(request):
@@ -172,14 +195,18 @@ def pcAuthForward(request):
         return JsonResponse({"error": "Authentication required."}, status=401)
 
     if _pc_requires_recent_mfa(request):
-        return JsonResponse({"error": "Recent MFA is required."}, status=403)
+        return redirect(rf'{settings.SITE_SCHEME}://{settings.PRIMARY_SITE_HOST}/accounts/2fa/reauthenticate/?next=%2Fservices%2Fpc%2F')
 
     guac_status = _pc_guacamole_status(request)
     if guac_status and guac_status.get("configured") and not guac_status.get("valid"):
-        return JsonResponse(
+        # Clear session cookies on failed guacamole authentication
+        response = JsonResponse(
             {"error": guac_status.get("message", "Guacamole credentials are invalid.")},
             status=403,
         )
+        response.delete_cookie("sessionid", path="/", domain=getattr(settings, "SESSION_COOKIE_DOMAIN"))
+        response.delete_cookie("csrftoken", path="/", domain=getattr(settings, "CSRF_COOKIE_DOMAIN"))
+        return response
 
     return HttpResponse(status=204)
 

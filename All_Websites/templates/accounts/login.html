@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -5,25 +7,31 @@
             Login
         </title>
         <meta charset="utf-8">
+        
+        <link rel="stylesheet" href="{% static 'css/accounts/login.css' %}" />
     </head>
     <body>
-        <h1>Login</h1>
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Login</button>
-        </form>
-        {% load socialaccount %}
-        <p>
-            <a href="{% provider_login_url 'google' process='login' %}">Continue with Google</a>
-        </p>
-        <p>
-            <a href="{% url 'mfa_login_webauthn' %}">Sign in with a passkey</a>
-        </p>
+        <div id="login-wrapper">
+            <h1>Login</h1>
+            {% if messages %}
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" id="submit-button">Login</button>
+            </form>
+            {% load socialaccount %}
+            <p>
+                <a href="{% provider_login_url 'google' process='login' %}">
+                    <img src="{% static 'img/accounts/Google Login Button.png' %}">
+                </a>
+            </p>
+            <!-- <p>
+                <a href="{% url 'mfa_login_webauthn' %}">Sign in with a passkey</a>
+            </p> -->
+        </div>
     </body>
 </html>

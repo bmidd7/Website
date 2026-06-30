@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Media
+{% endblock %}
+
+{% block extra-css %}
+{% endblock %}
+
+{% block app-specific-logo-in-sidebar %}
+<a href="/" name="sidebar-logo-link">
+    <img src="{% static 'img/logo.png' %}" id="sidebar-logo" alt="Website Logo | Return to Home Page">
+</a>
+{% endblock %}
+
+{% block main %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/hub/tendrils.js' %}"></script>
+{% endblock %}

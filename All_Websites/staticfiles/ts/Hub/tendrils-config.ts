@@ -63,13 +63,13 @@ export const HUB_CONFIG = {
     },
 
     projects: [
-        { label: "School", url: "/school/" },
+        // { label: "School", url: "/school/" },
         { label: "Chemistry", url: "/school/chemistry/" },
         { label: "APIs", url: "https://api.bmiddleton.dev/" },
-        { label: "Services", url: "/services/" },
-        { label: "Engineering", url: "/school/engineering/" },
-        { label: "Art", url: "/my-art/" },
-        { label: "AIs", url: "/ai/" },
+        { label: "Remote PC Access", url: "/services/pc" },
+        // { label: "Engineering", url: "/school/engineering/" },
+        // { label: "Art", url: "/my-art/" },
+        // { label: "AIs", url: "/ai/" },
         { label: "Fly", url: "/fly/" },
     ] satisfies ProjectDefinition[],
 

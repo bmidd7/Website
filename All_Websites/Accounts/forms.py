@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserComputer
+from .models import UserComputer, MFA
 
 class CustomSignupForm(forms.Form):
     first_name = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'placeholder':'First Name'}))
@@ -87,3 +87,30 @@ class UserComputerSettingsForm(forms.ModelForm):
         if commit:
             computer.save()
         return computer
+
+
+class MFASettingsForm(forms.ModelForm):
+    MFA_FREQUENCY_CHOICES = [
+        (15, "Every 15 minutes"),
+        (30, "Every 30 minutes"),
+        (60, "Every 1 hour"),
+        (90, "Every 1.5 hours"),
+        (120, "Every 2 hours"),
+        (180, "Every 3 hours"),
+        (240, "Every 4 hours"),
+        (480, "Every 8 hours"),
+        (1440, "Every 24 hours"),
+    ]
+
+    mfa_frequency_minutes = forms.TypedChoiceField(
+        choices=MFA_FREQUENCY_CHOICES,
+        coerce=int,
+        widget=forms.Select,
+        label="MFA Frequency for PC Access",
+        help_text="How often you need to re-authenticate with MFA to access your PC via Guacamole",
+    )
+
+    class Meta:
+        model = MFA
+        fields = ["mfa_frequency_minutes"]
+

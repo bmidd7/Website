@@ -52,7 +52,7 @@ if (!mfaRequired) {
         requiredSetupPanel.hidden = true;
         requiredRemoteFrame.hidden = false;
         requiredRemoteLink.href = launchUrl || desktopUrl;
-        requiredRemoteFrame.src = desktopUrl;
+        requiredRemoteFrame.src = launchUrl || desktopUrl;
         if (guacConfigured && !guacValid) {
             setRemoteMessage(guacMessage || "Saved Guacamole credentials were rejected.", "error");
             return;

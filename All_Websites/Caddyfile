@@ -3,10 +3,22 @@
 }
 
 bmiddleton.dev, www.bmiddleton.dev {
+	handle /static/* {
+		uri strip_prefix /static
+		root * "M:/C VSCode/.vscode/Website/All_Websites/staticfiles"
+		file_server
+	}
+
 	reverse_proxy 127.0.0.1:8000
 }
 
 api.bmiddleton.dev {
+	handle /static/* {
+		uri strip_prefix /static
+		root * "M:/C VSCode/.vscode/Website/All_Websites/staticfiles"
+		file_server
+	}
+
 	reverse_proxy 127.0.0.1:8000
 }
 
@@ -16,4 +28,8 @@ remote.bmiddleton.dev {
 	}
 
 	reverse_proxy 127.0.0.1:6022
+}
+
+ai.bmiddleton.dev/odysseus {
+	reverse_proxy 127.0.0.1:6573
 }
