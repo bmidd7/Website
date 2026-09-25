@@ -3,7 +3,17 @@ from django.conf import settings
 from datetime import date, timedelta
 from decimal import Decimal
 
-from APIs.models import Genre, Movie, Quality, DiskType
+from APIs.models import (
+    BookContact,
+    BookCopy,
+    BookReading,
+    Books,
+    BookTransfer,
+    DiskType,
+    Genre,
+    Movie,
+    Quality,
+)
 from APIs.management.commands.import_movies import Command as ImportMoviesCommand
 from APIs.management.commands.import_shows import Command as ImportShowsCommand
 from APIs.management.commands.import_songs import Command as ImportSongsCommand
@@ -133,3 +143,46 @@ class ImportSongsParsingTests(TestCase):
         cmd = ImportSongsCommand()
         self.assertEqual(str(cmd.parse_bitrate_kbps("40kbps")), "40.000")
         self.assertEqual(str(cmd.parse_size_mb("1.296 MB")), "1.296")
+
+
+class BookCollectionModelTests(TestCase):
+    def test_a_copy_can_record_its_owner_and_gift_history(self):
+        owner = BookContact.objects.create(name="Brad", relationship=BookContact.Relationship.SELF)
+        recipient = BookContact.objects.create(name="Aunt Monica", relationship=BookContact.Relationship.FAMILY)
+        book = Books.objects.create(
+            title="The Hobbit",
+            authors="J. R. R. Tolkien",
+            binding=Books.Binding.LEATHER_BOUND,
+            isbn_13="9780007525515",
+        )
+        copy = BookCopy.objects.create(
+            book=book,
+            inventory_number="BOOK-0001",
+            current_holder=owner,
+            condition=BookCopy.Condition.VERY_GOOD,
+        )
+        transfer = BookTransfer.objects.create(
+            copy=copy,
+            transfer_type=BookTransfer.TransferType.GIFT,
+            transferred_on=date(2026, 9, 20),
+            from_person=owner,
+            to_person=recipient,
+        )
+
+        self.assertEqual(book.get_binding_display(), "Leather-bound")
+        self.assertTrue(copy.is_in_collection)
+        self.assertEqual(copy.transfers.get(), transfer)
+        self.assertEqual(transfer.to_person, recipient)
+
+    def test_each_family_member_has_a_separate_reading_record(self):
+        reader = BookContact.objects.create(name="Grandma")
+        book = Books.objects.create(title="A Wrinkle in Time")
+        record = BookReading.objects.create(
+            book=book,
+            reader=reader,
+            status=BookReading.ReadingStatus.READ,
+            rating=5,
+        )
+
+        self.assertEqual(book.reading_records.get(), record)
+        self.assertEqual(reader.reading_records.get().rating, 5)

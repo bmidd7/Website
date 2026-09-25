@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 # Create your models here.
@@ -6,7 +8,7 @@ class API_results(models.Model):
     Date = models.DateField()
     Source = models.CharField(max_length=50)
 
-
+# region Media
 class Rating(models.TextChoices):
     General = 'G', 'G'
     Suggested_Guidance = 'PG', 'PG'
@@ -259,3 +261,432 @@ class Music(models.Model):
     source = models.CharField(max_length=50, default="", blank=True)
 
     notes = models.TextField(blank=True, default='')
+#endregion
+
+class Coins(models.Model):
+    Country = models.CharField()
+    Country_Code = models.CharField(max_length=3)
+    Issuing_Authority = models.CharField()
+    Issuing_Mint = models.CharField()
+    Mint_Mark = models.CharField()
+
+    Year = models.CharField()
+    Currency = models.CharField()
+    Denomination = models.CharField()
+
+    Coin_Name = models.CharField()
+    Coin_Series = models.CharField()
+    Type = models.CharField()
+
+    Composition = models.TextField()
+    Main_Metal = models.CharField()
+    Weight = models.CharField()
+    Diameter = models.CharField()
+    Thickness = models.CharField()
+
+    Shape = models.CharField()
+    Edge = models.CharField()
+
+    Obverse_Design = models.CharField()
+    Reverse_Design = models.CharField()
+      
+
+    #Pics
+    # Obverse_Pic = 
+    # Reverse_Pic = 
+
+class BookContact(models.Model):
+    """A household member or other person connected to the book collection."""
+
+    class Relationship(models.TextChoices):
+        SELF = "self", "Me"
+        FAMILY = "family", "Family member"
+        FRIEND = "friend", "Friend"
+        ORGANIZATION = "organization", "Organization"
+        OTHER = "other", "Other"
+
+    name = models.CharField(max_length=150)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="book_contact",
+        help_text="Optionally link this person to a website account.",
+    )
+    relationship = models.CharField(
+        max_length=20,
+        choices=Relationship.choices,
+        default=Relationship.FAMILY,
+    )
+    email = models.EmailField(blank=True, default="")
+    notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
+class Books(models.Model):
+    """A catalog record for a particular book edition, rather than one copy."""
+
+    class Binding(models.TextChoices):
+        HARDCOVER = "hardcover", "Hardcover"
+        PAPERBACK = "paperback", "Paperback"
+        LEATHER_BOUND = "leather_bound", "Leather-bound"
+        CLOTH_BOUND = "cloth_bound", "Cloth-bound"
+        PERFECT_BOUND = "perfect_bound", "Perfect-bound"
+        SADDLE_STITCHED = "saddle_stitched", "Saddle-stitched"
+        SPIRAL_OR_WIRE_BOUND = "spiral_or_wire_bound", "Spiral or wire-bound"
+        COMB_BOUND = "comb_bound", "Comb-bound"
+        BOARD_BOOK = "board_book", "Board book"
+        LOOSE_LEAF = "loose_leaf", "Loose-leaf"
+        BOXED_SET = "boxed_set", "Boxed set"
+        EBOOK = "ebook", "eBook"
+        AUDIOBOOK = "audiobook", "Audiobook"
+        OTHER = "other", "Other"
+
+    title = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=255, blank=True, default="")
+    authors = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Use a semicolon between multiple authors.",
+    )
+    contributors = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Illustrators, editors, translators, narrators, and so on.",
+    )
+    description = models.TextField(blank=True, default="")
+    series_name = models.CharField(max_length=255, blank=True, default="")
+    series_number = models.CharField(max_length=30, blank=True, default="")
+    volume_number = models.CharField(max_length=30, blank=True, default="")
+
+    edition = models.CharField(max_length=100, blank=True, default="")
+    printing = models.CharField(max_length=100, blank=True, default="")
+    publisher = models.CharField(max_length=255, blank=True, default="")
+    imprint = models.CharField(max_length=255, blank=True, default="")
+    publication_date = models.DateField(null=True, blank=True)
+    original_publication_date = models.DateField(null=True, blank=True)
+    copyright_year = models.PositiveSmallIntegerField(null=True, blank=True)
+    language = models.CharField(max_length=100, blank=True, default="")
+    original_language = models.CharField(max_length=100, blank=True, default="")
+    page_count = models.PositiveIntegerField(null=True, blank=True)
+
+    isbn_10 = models.CharField(max_length=20, blank=True, default="")
+    isbn_13 = models.CharField(max_length=20, blank=True, default="")
+    oclc_number = models.CharField(max_length=30, blank=True, default="")
+    library_of_congress_number = models.CharField(max_length=50, blank=True, default="")
+    open_library_id = models.CharField(max_length=50, blank=True, default="")
+    goodreads_id = models.CharField(max_length=50, blank=True, default="")
+
+    binding = models.CharField(
+        max_length=25,
+        choices=Binding.choices,
+        blank=True,
+        default="",
+    )
+    cover_material = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="For example: paper, cloth, genuine leather, or faux leather.",
+    )
+    dimensions = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="For example: 8.5 x 11 in.",
+    )
+    weight_oz = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    genres = models.CharField(max_length=500, blank=True, default="")
+    subjects = models.CharField(max_length=1000, blank=True, default="")
+    is_illustrated = models.BooleanField(default=False)
+    cover_image_url = models.URLField(blank=True, default="")
+    cover_primary_color = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Most prominent cover color; use a CSS color name or hex value.",
+    )
+    cover_secondary_color = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Second-most prominent cover color.",
+    )
+    cover_tertiary_color = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Third-most prominent cover color.",
+    )
+    cover_quaternary_color = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Fourth-most prominent cover color.",
+    )
+    notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["title", "edition", "publication_date"]
+
+    def __str__(self):
+        return f"{self.title}{f' ({self.edition})' if self.edition else ''}"
+
+    def clean(self):
+        super().clean()
+        colors = [
+            self.cover_primary_color,
+            self.cover_secondary_color,
+            self.cover_tertiary_color,
+            self.cover_quaternary_color,
+        ]
+        filled = [bool(color.strip()) for color in colors]
+        if any(filled) and sum(filled) < 2:
+            raise ValidationError("Provide at least two cover colors when adding a color scheme.")
+        if any(filled[index] and not all(filled[:index]) for index in range(1, len(filled))):
+            raise ValidationError("Cover colors must be entered from primary to quaternary without gaps.")
+
+
+class BookCopy(models.Model):
+    """One physical or digital copy of a catalogued book."""
+
+    class CollectionStatus(models.TextChoices):
+        IN_COLLECTION = "in_collection", "In our collection"
+        LENT_OUT = "lent_out", "Lent out"
+        GIFTED = "gifted", "Given as a gift"
+        SOLD = "sold", "Sold"
+        DONATED = "donated", "Donated"
+        LOST = "lost", "Lost"
+        DISCARDED = "discarded", "Discarded"
+
+    class Condition(models.TextChoices):
+        NEW = "new", "New"
+        LIKE_NEW = "like_new", "Like new"
+        VERY_GOOD = "very_good", "Very good"
+        GOOD = "good", "Good"
+        FAIR = "fair", "Fair"
+        POOR = "poor", "Poor"
+        DAMAGED = "damaged", "Damaged"
+
+    class AcquisitionMethod(models.TextChoices):
+        PURCHASED = "purchased", "Purchased"
+        GIFT_RECEIVED = "gift_received", "Gift received"
+        INHERITED = "inherited", "Inherited"
+        BORROWED = "borrowed", "Borrowed"
+        DONATED_TO_US = "donated_to_us", "Donated to us"
+        FOUND = "found", "Found"
+        OTHER = "other", "Other"
+
+    book = models.ForeignKey(Books, on_delete=models.CASCADE, related_name="copies")
+    inventory_number = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    barcode = models.CharField(max_length=100, blank=True, default="")
+    current_holder = models.ForeignKey(
+        BookContact,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="books_currently_holding",
+        help_text="The person who currently has this copy.",
+    )
+    collection_status = models.CharField(
+        max_length=20,
+        choices=CollectionStatus.choices,
+        default=CollectionStatus.IN_COLLECTION,
+    )
+    current_location = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="For example: home office, attic, or Jane's house.",
+    )
+    shelf_location = models.CharField(max_length=100, blank=True, default="")
+    condition = models.CharField(
+        max_length=20,
+        choices=Condition.choices,
+        blank=True,
+        default="",
+    )
+    has_dust_jacket = models.BooleanField(default=False)
+    dust_jacket_condition = models.CharField(
+        max_length=20,
+        choices=Condition.choices,
+        blank=True,
+        default="",
+    )
+    is_signed = models.BooleanField(default=False)
+    signed_by = models.CharField(max_length=255, blank=True, default="")
+    inscription = models.TextField(blank=True, default="")
+    personalized_to = models.CharField(max_length=255, blank=True, default="")
+    acquisition_method = models.CharField(
+        max_length=20,
+        choices=AcquisitionMethod.choices,
+        blank=True,
+        default="",
+    )
+    acquired_from = models.ForeignKey(
+        BookContact,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="books_acquired_from_them",
+    )
+    acquired_on = models.DateField(null=True, blank=True)
+    purchase_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    estimated_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    currency = models.CharField(max_length=3, default="USD")
+    notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["book__title", "inventory_number"]
+
+    @property
+    def is_in_collection(self):
+        return self.collection_status == self.CollectionStatus.IN_COLLECTION
+
+    def __str__(self):
+        identifier = self.inventory_number or (f"copy {self.pk}" if self.pk else "new copy")
+        return f"{self.book} — {identifier}"
+
+
+class BookAutograph(models.Model):
+    """One autograph or inscription contained in a particular book copy."""
+
+    class SignerRole(models.TextChoices):
+        AUTHOR = "author", "Author"
+        ILLUSTRATOR = "illustrator", "Illustrator"
+        EDITOR = "editor", "Editor"
+        TRANSLATOR = "translator", "Translator"
+        NARRATOR = "narrator", "Narrator"
+        SUBJECT = "subject", "Book subject"
+        OTHER = "other", "Other"
+
+    copy = models.ForeignKey(BookCopy, on_delete=models.CASCADE, related_name="autographs")
+    signer = models.CharField(max_length=255)
+    signer_role = models.CharField(
+        max_length=20,
+        choices=SignerRole.choices,
+        blank=True,
+        default="",
+    )
+    signed_on = models.DateField(null=True, blank=True)
+    location = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="For example: title page, front endpaper, or dust jacket.",
+    )
+    is_inscribed = models.BooleanField(default=False)
+    inscription = models.TextField(blank=True, default="")
+    personalized_to = models.CharField(max_length=255, blank=True, default="")
+    is_authenticated = models.BooleanField(default=False)
+    provenance = models.TextField(
+        blank=True,
+        default="",
+        help_text="How the autograph was obtained or authenticated.",
+    )
+    image_url = models.URLField(blank=True, default="")
+    notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["signer", "location", "id"]
+
+    def __str__(self):
+        return f"{self.copy}: {self.signer} autograph"
+
+
+class BookTransfer(models.Model):
+    """A dated record of a loan, gift, sale, donation, or return for a copy."""
+
+    class TransferType(models.TextChoices):
+        LOAN = "loan", "Loaned"
+        RETURN = "return", "Returned"
+        GIFT = "gift", "Given as a gift"
+        SALE = "sale", "Sold"
+        DONATION = "donation", "Donated"
+        TRANSFER = "transfer", "Transferred"
+
+    copy = models.ForeignKey(BookCopy, on_delete=models.CASCADE, related_name="transfers")
+    transfer_type = models.CharField(max_length=20, choices=TransferType.choices)
+    transferred_on = models.DateField()
+    from_person = models.ForeignKey(
+        BookContact,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="book_transfers_sent",
+    )
+    to_person = models.ForeignKey(
+        BookContact,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="book_transfers_received",
+    )
+    due_back_on = models.DateField(null=True, blank=True)
+    returned_on = models.DateField(null=True, blank=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    currency = models.CharField(max_length=3, default="USD")
+    notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-transferred_on", "-id"]
+
+    def __str__(self):
+        recipient = f" to {self.to_person}" if self.to_person else ""
+        return f"{self.copy}: {self.get_transfer_type_display()}{recipient}"
+
+
+class BookReading(models.Model):
+    """Optional reading progress, rating, and notes for each family member."""
+
+    class ReadingStatus(models.TextChoices):
+        NOT_STARTED = "not_started", "Not started"
+        READING = "reading", "Reading"
+        READ = "read", "Read"
+        DID_NOT_FINISH = "did_not_finish", "Did not finish"
+        REFERENCE = "reference", "Reference only"
+
+    book = models.ForeignKey(Books, on_delete=models.CASCADE, related_name="reading_records")
+    reader = models.ForeignKey(BookContact, on_delete=models.CASCADE, related_name="reading_records")
+    status = models.CharField(
+        max_length=20,
+        choices=ReadingStatus.choices,
+        default=ReadingStatus.NOT_STARTED,
+    )
+    started_on = models.DateField(null=True, blank=True)
+    finished_on = models.DateField(null=True, blank=True)
+    rating = models.PositiveSmallIntegerField(null=True, blank=True)
+    review = models.TextField(blank=True, default="")
+    notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["reader__name", "book__title"]
+        constraints = [
+            models.UniqueConstraint(fields=["book", "reader"], name="unique_book_reading_per_reader"),
+            models.CheckConstraint(
+                condition=models.Q(rating__isnull=True) | models.Q(rating__lte=5),
+                name="book_reading_rating_at_most_five",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.reader}: {self.book}"

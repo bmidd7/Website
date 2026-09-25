@@ -46,6 +46,11 @@
             </p>
             <form method="post">
                 {% csrf_token %}
+                {{ pc_security_form.as_p }}
+                <button type="submit" name="action" value="save_pc_security">Save authenticator-code preference</button>
+            </form>
+            <form method="post">
+                {% csrf_token %}
                 {{ mfa_form.as_p }}
                 <button type="submit" name="action" value="save_mfa">Save MFA Settings</button>
             </form>

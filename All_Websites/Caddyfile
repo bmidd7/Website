@@ -1,5 +1,5 @@
 {
-	admin 127.0.0.1:2020
+	admin 127.0.0.1:22339
 }
 
 bmiddleton.dev, www.bmiddleton.dev {
@@ -32,4 +32,8 @@ remote.bmiddleton.dev {
 
 ai.bmiddleton.dev/odysseus {
 	reverse_proxy 127.0.0.1:6573
+}
+
+:80 {
+    reverse_proxy 127.0.0.1:8000
 }

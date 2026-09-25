@@ -1,5 +1,5 @@
-from .forms import UserComputerSettingsForm, MFASettingsForm
-from .models import UserComputer, MFA
+from .forms import UserComputerSettingsForm, MFASettingsForm, PCSecurityPreferenceForm
+from .models import UserComputer, MFA, UserPreferences
 from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
@@ -39,9 +39,11 @@ def TESTEMAIL(request):
 def account_security_view(request):
     computer, _ = UserComputer.objects.get_or_create(user=request.user)
     mfa, _ = MFA.objects.get_or_create(user=request.user)
+    preferences, _ = UserPreferences.objects.get_or_create(user=request.user)
     
     computer_form = UserComputerSettingsForm(instance=computer, prefix="computer", user=request.user)
     mfa_form = MFASettingsForm(instance=mfa, prefix="mfa")
+    pc_security_form = PCSecurityPreferenceForm(instance=preferences, prefix="pc_security")
     guac_status = verify_guac_login(computer) if computer.desktop_url and computer.has_guac_password() else None
 
     if request.method == "POST":
@@ -67,6 +69,16 @@ def account_security_view(request):
                 mfa_form.save()
                 messages.success(request, "MFA frequency preference saved.")
                 return redirect("account_settings")
+        elif action == "save_pc_security":
+            pc_security_form = PCSecurityPreferenceForm(
+                request.POST,
+                instance=preferences,
+                prefix="pc_security",
+            )
+            if pc_security_form.is_valid():
+                pc_security_form.save()
+                messages.success(request, "Remote PC authenticator-code preference saved.")
+                return redirect("account_settings")
 
     return render(
         request,
@@ -74,6 +86,7 @@ def account_security_view(request):
         {
             "computer_form": computer_form,
             "mfa_form": mfa_form,
+            "pc_security_form": pc_security_form,
             "computer": computer,
             "guac_status": guac_status,
         },

@@ -50,6 +50,19 @@
   gap: clamp(1.2rem, 3vw, 2rem);
 }
 
+.pc-notices {
+  max-width: 48rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(46, 196, 182, 0.42);
+  border-radius: 8px;
+  background: rgba(46, 196, 182, 0.12);
+  color: #f6f1e8;
+}
+
+.pc-notices p {
+  margin: 0;
+}
+
 .pc-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(16rem, 26rem);
@@ -239,6 +252,63 @@
 .pc-step small {
   margin-top: 0.2rem;
   color: rgba(246, 241, 232, 0.58);
+}
+
+.pc-security-setting {
+  margin-top: auto;
+  padding: 1rem;
+  border: 1px solid rgba(46, 196, 182, 0.32);
+  border-radius: 8px;
+  background: rgba(46, 196, 182, 0.08);
+}
+
+.pc-security-setting h2 {
+  margin: 0;
+  font: 800 1.15rem Bahnschrift, "Segoe UI", sans-serif;
+}
+
+.pc-security-setting > p:not(.pc-kicker, .pc-security-status) {
+  margin: 0.65rem 0 0;
+  color: rgba(246, 241, 232, 0.72);
+  line-height: 1.45;
+}
+
+.pc-security-form {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.pc-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #f6f1e8;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.pc-toggle input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: #2ec4b6;
+}
+
+.pc-security-form .pc-secondary-button {
+  width: 100%;
+  margin-top: 0;
+}
+
+.pc-security-status {
+  margin: 0.85rem 0 0;
+  color: rgba(246, 241, 232, 0.62);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pc-form-errors {
+  color: #ff8a9a;
+  font-size: 0.9rem;
 }
 
 .pc-access-panel {

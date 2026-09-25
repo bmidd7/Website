@@ -5,12 +5,14 @@ from urllib.parse import urlencode
 
 from allauth.account.authentication import get_authentication_records
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from Accounts.models import UserComputer, MFA
+from Accounts.forms import PCSecurityPreferenceForm
+from Accounts.models import UserComputer, MFA, UserPreferences
 from Accounts.services import verify_guac_login
 
 PC_REMOTE_URL_ENV = "PC_REMOTE_URL"
@@ -116,6 +118,16 @@ def _get_mfa_max_age_seconds(request) -> int:
     return getattr(settings, "PC_MFA_MAX_AGE_SECONDS", 60 * 90)
 
 
+def _pc_totp_required(request) -> bool:
+    """Return the signed-in user's remote-PC MFA preference, safely defaulting on."""
+    user = getattr(request, "user", None)
+    if not user or not user.is_authenticated:
+        return True
+
+    preferences, _ = UserPreferences.objects.get_or_create(user=user)
+    return preferences.pc_totp_required
+
+
 def _recent_mfa_record(request) -> dict | None:
     max_age = _get_mfa_max_age_seconds(request)
     now = time.time()
@@ -130,7 +142,7 @@ def _recent_mfa_record(request) -> dict | None:
 
 
 def _pc_requires_recent_mfa(request) -> bool:
-    return _recent_mfa_record(request) is None
+    return _pc_totp_required(request) and _recent_mfa_record(request) is None
 
 
 def _pc_mfa_reauth_url(request) -> str:
@@ -143,8 +155,22 @@ def Dashboard(request):
 
 @login_required
 def PC(request):
+    preferences, _ = UserPreferences.objects.get_or_create(user=request.user)
+    pc_security_form = PCSecurityPreferenceForm(instance=preferences, prefix="pc_security")
+    if request.method == "POST" and request.POST.get("action") == "save_pc_security":
+        pc_security_form = PCSecurityPreferenceForm(
+            request.POST,
+            instance=preferences,
+            prefix="pc_security",
+        )
+        if pc_security_form.is_valid():
+            pc_security_form.save()
+            messages.success(request, "Remote PC authenticator-code preference saved.")
+            return redirect("Services_PC")
+
     desktop_url = _pc_desktop_url_for_request(request)
     mfa_max_age_minutes = int(_get_mfa_max_age_seconds(request) / 60)
+    pc_totp_required = preferences.pc_totp_required
     return render(
         request,
         "services/pc.html",
@@ -156,6 +182,8 @@ def PC(request):
             "pc_mfa_required": _pc_requires_recent_mfa(request),
             "pc_mfa_url": _pc_mfa_reauth_url(request),
             "pc_mfa_max_age_minutes": mfa_max_age_minutes,
+            "pc_totp_required": pc_totp_required,
+            "pc_security_form": pc_security_form,
             "pc_recent_mfa_record": _recent_mfa_record(request),
             "pc_guacamole_status": _pc_guacamole_status(request),
             "pc_bridge_status": _pc_bridge_status(request),

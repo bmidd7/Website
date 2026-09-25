@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserComputer, MFA
+from .models import UserComputer, MFA, UserPreferences
 
 class CustomSignupForm(forms.Form):
     first_name = forms.CharField(max_length=20, widget=forms.TextInput(attrs={'placeholder':'First Name'}))
@@ -114,3 +114,14 @@ class MFASettingsForm(forms.ModelForm):
         model = MFA
         fields = ["mfa_frequency_minutes"]
 
+
+class PCSecurityPreferenceForm(forms.ModelForm):
+    pc_totp_required = forms.BooleanField(
+        required=False,
+        label="Require an authenticator code before opening my PC",
+        help_text="When enabled, remote access asks for TOTP or another MFA method you have configured.",
+    )
+
+    class Meta:
+        model = UserPreferences
+        fields = ["pc_totp_required"]

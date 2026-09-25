@@ -50,6 +50,10 @@ class UserPreferences(models.Model):
     }
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='preferences')
     notifications_on = models.BooleanField(default=False)
+    pc_totp_required = models.BooleanField(
+        default=True,
+        help_text="Require a TOTP or other configured MFA method before opening remote PC access.",
+    )
     
     
     text_font = models.CharField(max_length=20, default='Arial')

@@ -6,7 +6,7 @@ Away PC
 {% endblock %}
 
 {% block extra-css %}
-<link rel="stylesheet" href="{% static 'css/services/pc.css' %}?v=20260514a">
+<link rel="stylesheet" href="{% static 'css/services/pc.css' %}?v=20260823a">
 {% endblock %}
 
 {% block app-specific-logo-in-sidebar %}
@@ -34,11 +34,25 @@ Away PC
     data-guac-valid="{% if pc_guacamole_status and pc_guacamole_status.valid %}true{% else %}false{% endif %}"
     data-guac-message="{% if pc_guacamole_status %}{{ pc_guacamole_status.message }}{% endif %}"
 >
+    {% if messages %}
+        <div class="pc-notices" role="status">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="pc-hero">
         <div class="pc-hero-copy">
             <p class="pc-kicker">Private remote workspace</p>
             <h1>{{ pc_remote_name }}</h1>
-            <p class="pc-subtitle">Remote access is unlocked by a recent MFA check.</p>
+            <p class="pc-subtitle">
+                {% if pc_totp_required %}
+                    Remote access is unlocked by a recent authenticator-code check.
+                {% else %}
+                    Authenticator-code checks are turned off for this PC account.
+                {% endif %}
+            </p>
         </div>
 
         <div class="pc-device" aria-hidden="true">
@@ -62,12 +76,14 @@ Away PC
                 <li class="pc-step" data-step-status="{% if pc_mfa_required %}active{% else %}complete{% endif %}">
                     <span class="pc-step-marker">1</span>
                     <span>
-                        <strong>MFA check</strong>
+                        <strong>Authenticator code</strong>
                         <small>
                             {% if pc_mfa_required %}
                                 Required every {{ pc_mfa_max_age_minutes }} minutes
-                            {% else %}
+                            {% elif pc_totp_required %}
                                 Verified
+                            {% else %}
+                                Not required by your preference
                             {% endif %}
                         </small>
                     </span>
@@ -88,19 +104,41 @@ Away PC
                     </span>
                 </li>
             </ol>
+
+            <section class="pc-security-setting" aria-labelledby="pc-security-heading">
+                <p class="pc-kicker">Access security</p>
+                <h2 id="pc-security-heading">Authenticator code</h2>
+                <p>Choose whether this account needs TOTP or another configured MFA method before opening its remote PC.</p>
+                <form method="post" class="pc-security-form">
+                    {% csrf_token %}
+                    <label class="pc-toggle" for="{{ pc_security_form.pc_totp_required.id_for_label }}">
+                        {{ pc_security_form.pc_totp_required }}
+                        <span>Require a code to open my PC</span>
+                    </label>
+                    {% if pc_security_form.pc_totp_required.errors %}
+                        <div class="pc-form-errors">{{ pc_security_form.pc_totp_required.errors }}</div>
+                    {% endif %}
+                    <button class="pc-secondary-button" type="submit" name="action" value="save_pc_security">Save security setting</button>
+                </form>
+                {% if pc_totp_required %}
+                    <p class="pc-security-status">On — you will be prompted again after {{ pc_mfa_max_age_minutes }} minutes.</p>
+                {% else %}
+                    <p class="pc-security-status">Off — opening this PC only requires that you are signed in to the website.</p>
+                {% endif %}
+            </section>
         </aside>
 
         <section class="pc-access-panel" aria-label="PC access">
             {% if pc_mfa_required %}
                 <div class="pc-auth-form">
                     <div class="pc-form-heading">
-                        <p class="pc-kicker">MFA required</p>
+                        <p class="pc-kicker">Authenticator code required</p>
                         <h2>Verify again to open your PC</h2>
                     </div>
                     <p class="pc-auth-message">
-                        This access expires after {{ pc_mfa_max_age_minutes }} minutes. Reauthenticate with your MFA method to continue.
+                        This access expires after {{ pc_mfa_max_age_minutes }} minutes. Reauthenticate with your TOTP or other configured MFA method to continue.
                     </p>
-                    <a class="pc-primary-link" href="{{ pc_mfa_url }}">Verify with MFA</a>
+                    <a class="pc-primary-link" href="{{ pc_mfa_url }}">Verify with a code</a>
                 </div>
             {% else %}
                 <div id="pc-remote-panel" class="pc-remote-panel">
