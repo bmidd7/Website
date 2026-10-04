@@ -14,3 +14,6 @@ All_Websites/Services/guacamole-stack/
 All_Websites/Accounts/services.py
 All_Websites/Fly/proofread_connections_783.feather
 All_Websites/All_Websites/settings.py
+media_commands.txt
+website_commands.txt
+update_files.ps1

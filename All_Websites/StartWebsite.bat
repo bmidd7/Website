@@ -1,5 +1,5 @@
 @echo off
-title My Django + Caddy + Guacamole Server
+title Website
 
 set PROJECT_DIR=M:\C VSCode\.vscode\Website\All_Websites
 set ODYESSEUS_DIR=M:\C VSCode\odysseus

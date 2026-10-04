@@ -1,3 +1,4 @@
 {
-    "xcodeIntegration.projectPath": "m:\\C VSCode\\.vscode\\Website"
+    "xcodeIntegration.projectPath": "m:\\C VSCode\\.vscode\\Website",
+    "compilets.autoStart": true
 }
