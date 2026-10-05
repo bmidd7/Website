@@ -1,0 +1,43 @@
+Security Policy
+
+Reporting
+---------
+Security vulnerabilities should be reported to:
+mailto:B.rad.M.Website@gmail.com
+
+Please include:
+- A description of the vulnerability
+- The affected URL or component
+- Steps to reproduce the issue
+- Potential impact
+- Any relevant screenshots, logs, or proof of concept
+
+Scope
+-----
+This policy applies to:
+- bmiddleton.dev
+- *.bmiddleton.dev
+
+Out of Scope
+------------
+The following are not considered security vulnerabilities:
+- Social engineering
+- Spam
+- Physical attacks
+- Issues affecting third-party services
+
+Response
+--------
+Reports will be reviewed as soon as reasonably possible.
+Additional information may be requested when necessary.
+
+Disclosure
+----------
+Please allow reasonable time for investigation and remediation
+before publicly disclosing a vulnerability.
+
+Acknowledgment
+--------------
+Researchers who responsibly report valid vulnerabilities may be
+credited with their permission. They will be found at:
+https://bmiddleton.dev/acknowledgments

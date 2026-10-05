@@ -10,8 +10,11 @@ class SubdomainURLConfMiddleware:
     def __call__(self, request):
         host = request.get_host().split(":", 1)[0].lower()
         api_host = getattr(settings, "API_SITE_HOST", "").lower()
+        calendar_host = getattr(settings, "CALENDAR_SITE_HOST", "").lower()
 
         if api_host and host == api_host:
             request.urlconf = "All_Websites.api_urls"
+        elif calendar_host and host == calendar_host:
+            request.urlconf = "Calendar.urls"
 
         return self.get_response(request)

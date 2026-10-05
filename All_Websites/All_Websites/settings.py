@@ -44,14 +44,15 @@ SITE_SCHEME = os.environ.get("SITE_SCHEME", "https")
 PRIMARY_SITE_HOST = os.environ.get("PRIMARY_SITE_HOST", "bmiddleton.dev")
 API_SITE_HOST = os.environ.get("API_SITE_HOST", "api.bmiddleton.dev")
 REMOTE_SITE_HOST = os.environ.get("REMOTE_SITE_HOST", "remote.bmiddleton.dev")
+CALENDAR_SITE_HOST = os.environ.get("CALENDAR_SITE_HOST", "calendar.bmiddleton.dev")
 
-ALLOWED_HOSTS = ['*', PRIMARY_SITE_HOST, f"www.{PRIMARY_SITE_HOST}", API_SITE_HOST, REMOTE_SITE_HOST]
+ALLOWED_HOSTS = ['*', PRIMARY_SITE_HOST, f"www.{PRIMARY_SITE_HOST}", API_SITE_HOST, REMOTE_SITE_HOST, CALENDAR_SITE_HOST]
 
 CSRF_TRUSTED_ORIGINS = [
    # 'http://localhost:8000', 'https://localhost:8000',
     'https://isreal-brainy-irreclaimably.ngrok-free.dev/',
     f"{SITE_SCHEME}://{PRIMARY_SITE_HOST}", f"{SITE_SCHEME}://www.{PRIMARY_SITE_HOST}",
-    f"{SITE_SCHEME}://{API_SITE_HOST}", f"{SITE_SCHEME}://{REMOTE_SITE_HOST}",
+    f"{SITE_SCHEME}://{API_SITE_HOST}", f"{SITE_SCHEME}://{REMOTE_SITE_HOST}", f"{SITE_SCHEME}://{CALENDAR_SITE_HOST}",
     ]
 
 FORMS_URLFIELD_ASSUME_HTTPS = True
@@ -94,6 +95,8 @@ INSTALLED_APPS = [
     'AI',
     'Services',
     'Fly',
+    'Calendar',
+    'SiteConfigFiles',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,32 @@
+/* TEAM */
+
+Bradley M. Middleton
+Role: Developer
+Contact: B.rad.M.Website@gmail.com
+Location: Dyer, Indiana, USA
+
+
+Henry J. Leible
+Role: Tester
+Contact: HenryJLeible@gmail.com
+Location: St. John, Indiana, USA
+
+
+
+/* SITE */
+
+Site: bmiddleton.dev
+Last update: 2026/10/04
+Language: English
+Doctype: HTML5
+Standards: HTML5, CSS3, PEP 8
+Components: Django, TypeScript, SCSS, Apache Guacamole, Odysseus (By PewDiePie)
+Software: Visual Studio Code, Git
+
+
+/* TECHNOLOGY */
+
+Backend: Django
+Frontend: TypeScript, HTML, CSS
+Web server: Waitress
+Reverse proxy: Caddy

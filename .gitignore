@@ -17,3 +17,4 @@ All_Websites/All_Websites/settings.py
 media_commands.txt
 website_commands.txt
 update_files.ps1
+All_Websites/RestartWebsites.bat

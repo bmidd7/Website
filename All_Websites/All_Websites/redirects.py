@@ -53,6 +53,7 @@ def redirect_fly_api_to_subdomain(request):
     return HttpResponse(status=307, headers={"Location": _append_query(url, query)})
 
 
+
 def redirect_with_next(request, target: str):
     next_url = request.get_full_path()
     query = urlencode({"next": next_url})

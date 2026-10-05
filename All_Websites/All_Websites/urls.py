@@ -37,10 +37,13 @@ urlpatterns = [
     re_path(r"^Services/?(?P<remaining>.*)$", lambda request, remaining="": redirect_to_local_kebab(request, "services", remaining)),
     re_path(r"^Fly/api/simulate/?$", redirect_fly_api_to_subdomain),
     re_path(r"^Fly/?(?P<remaining>.*)$", lambda request, remaining="": redirect_to_local_kebab(request, "fly", remaining)),
+    re_path(r"^Calendar/?(?P<remaining>.*)$", lambda request, remaining="": redirect_to_local_kebab(request, "calendar", remaining)),
     path('school/', include('School.urls')),
     path('ai/', include('AI.urls')),
     path('services/', include('Services.urls')),
     path('fly/', include('Fly.urls')),
+    path('calendar/', include('Calendar.urls')),
+    path('', include('SiteConfigFiles.urls')),
 ]
 
 from django.conf import settings

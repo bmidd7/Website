@@ -1,0 +1,6 @@
+Contact: mailto:B.rad.M.Website@gmail.com
+Acknowledgments: https://bmiddleton.dev/acknowledgments
+Canonical: https://bmiddleton.dev/.well-known/security.txt
+Preferred-Languages: en-us
+Policy: https://bmiddleton.dev/security-policy/
+Expires: 2029-05-12T00:00:00Z

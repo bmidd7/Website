@@ -1,0 +1,16 @@
+# bmiddleton.dev
+
+> bmiddleton.dev is the personal website of Bradley Middleton, a student and developer based in Indiana. The site contains information about Bradley, software and engineering projects, technical interests, and other personal projects.
+
+The website is primarily focused on software development, computer science, engineering, robotics, artificial intelligence, and related technical projects.
+
+## About
+
+- [About](https://bmiddleton.dev/about/): Information about Bradley, his background, interests, and goals.
+- [Contact](https://bmiddleton.dev/contact/): Contact information and methods for getting in touch.
+
+## Projects
+
+- [Projects](https://bmiddleton.dev/projects/): Overview of software, engineering, electronics, robotics, and other projects.
+- [Software](https://bmiddleton.dev/projects/software/): Software development projects and applications.
+- [Engineering](https://bmiddleton.dev/projects/engineering/): Engineering, electronics, robotics, CAD, and physical projects.
